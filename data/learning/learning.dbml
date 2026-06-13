@@ -1,0 +1,367 @@
+Project LangoraLearning {
+  database_type: "PostgreSQL"
+
+  Note: '''
+  Learning Domain
+
+  Responsibility:
+  - Language Structure
+  - Curriculum Structure
+  - Levels
+  - Units
+  - Lessons
+  - Learning Paths
+
+  Future Microservice:
+  learning-service
+  '''
+}
+
+///////////////////////////////////////////////////////////
+//// ENUMS
+///////////////////////////////////////////////////////////
+
+Enum language_status {
+  ACTIVE
+  INACTIVE
+}
+
+Enum lesson_type {
+  VOCABULARY
+  GRAMMAR
+  READING
+  LISTENING
+  SPEAKING
+  WRITING
+  MIXED
+}
+
+Enum lesson_status {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+///////////////////////////////////////////////////////////
+//// LANGUAGES
+///////////////////////////////////////////////////////////
+
+Table languages {
+
+  id uuid [pk]
+
+  code varchar(20) [not null, unique]
+
+  name varchar(100) [not null]
+
+  native_name varchar(100)
+
+  flag_icon_url text
+
+  status language_status [default: 'ACTIVE']
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  Examples
+
+  en
+  ja
+  ko
+  zh
+  '''
+}
+
+///////////////////////////////////////////////////////////
+//// CEFR LEVELS
+///////////////////////////////////////////////////////////
+
+Table levels {
+
+  id uuid [pk]
+
+  language_id uuid [not null]
+
+  code varchar(20)
+
+  name varchar(100)
+
+  order_index integer
+
+  description text
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+  '''
+}
+
+Ref: levels.language_id > languages.id
+
+///////////////////////////////////////////////////////////
+//// LEARNING PATHS
+///////////////////////////////////////////////////////////
+
+Table learning_paths {
+
+  id uuid [pk]
+
+  language_id uuid [not null]
+
+  title varchar(255)
+
+  description text
+
+  estimated_hours integer
+
+  is_default boolean [default: false]
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  Complete learning roadmap
+  '''
+}
+
+Ref: learning_paths.language_id > languages.id
+
+///////////////////////////////////////////////////////////
+//// UNITS
+///////////////////////////////////////////////////////////
+
+Table units {
+
+  id uuid [pk]
+
+  learning_path_id uuid [not null]
+
+  level_id uuid [not null]
+
+  title varchar(255)
+
+  description text
+
+  order_index integer
+
+  estimated_minutes integer
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  Group of lessons
+  '''
+}
+
+Ref: units.learning_path_id > learning_paths.id
+Ref: units.level_id > levels.id
+
+///////////////////////////////////////////////////////////
+//// LESSONS
+///////////////////////////////////////////////////////////
+
+Table lessons {
+
+  id uuid [pk]
+
+  unit_id uuid [not null]
+
+  title varchar(255)
+
+  description text
+
+  lesson_type lesson_type
+
+  lesson_status lesson_status
+
+  order_index integer
+
+  estimated_minutes integer
+
+  thumbnail_url text
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  Smallest learning content unit
+  '''
+}
+
+Ref: lessons.unit_id > units.id
+
+///////////////////////////////////////////////////////////
+//// LESSON PREREQUISITES
+///////////////////////////////////////////////////////////
+
+Table lesson_prerequisites {
+
+  lesson_id uuid [not null]
+
+  prerequisite_lesson_id uuid [not null]
+
+  created_at timestamptz
+
+  Note: '''
+  Lesson dependency graph
+  '''
+}
+
+Ref: lesson_prerequisites.lesson_id > lessons.id
+Ref: lesson_prerequisites.prerequisite_lesson_id > lessons.id
+
+///////////////////////////////////////////////////////////
+//// LESSON RESOURCES
+///////////////////////////////////////////////////////////
+
+Table lesson_resources {
+
+  id uuid [pk]
+
+  lesson_id uuid [not null]
+
+  title varchar(255)
+
+  resource_type varchar(50)
+
+  file_url text
+
+  created_at timestamptz
+
+  Note: '''
+  PDF
+  Audio
+  Video
+  Image
+  '''
+}
+
+Ref: lesson_resources.lesson_id > lessons.id
+
+///////////////////////////////////////////////////////////
+//// USER LESSON PROGRESS
+///////////////////////////////////////////////////////////
+
+Table user_lesson_progress {
+
+  id uuid [pk]
+
+  user_id uuid [
+    not null,
+    note: 'FK -> identity.users.id'
+  ]
+
+  lesson_id uuid [not null]
+
+  progress_percentage decimal
+
+  completed boolean [default: false]
+
+  completed_at timestamptz
+
+  last_accessed_at timestamptz
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  Track lesson completion
+  '''
+}
+
+Ref: user_lesson_progress.lesson_id > lessons.id
+
+// Ref: user_lesson_progress.user_id > users.id
+
+///////////////////////////////////////////////////////////
+//// USER UNIT PROGRESS
+///////////////////////////////////////////////////////////
+
+Table user_unit_progress {
+
+  id uuid [pk]
+
+  user_id uuid [
+    not null,
+    note: 'FK -> identity.users.id'
+  ]
+
+  unit_id uuid [not null]
+
+  completed_lessons integer [default: 0]
+
+  total_lessons integer [default: 0]
+
+  completion_percentage decimal
+
+  completed boolean [default: false]
+
+  completed_at timestamptz
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  Unit level progress
+  '''
+}
+
+Ref: user_unit_progress.unit_id > units.id
+
+// Ref: user_unit_progress.user_id > users.id
+
+///////////////////////////////////////////////////////////
+//// USER PATH PROGRESS
+///////////////////////////////////////////////////////////
+
+Table user_learning_path_progress {
+
+  id uuid [pk]
+
+  user_id uuid [
+    not null,
+    note: 'FK -> identity.users.id'
+  ]
+
+  learning_path_id uuid [not null]
+
+  completion_percentage decimal
+
+  completed boolean [default: false]
+
+  completed_at timestamptz
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  Overall path progress
+  '''
+}
+
+Ref: user_learning_path_progress.learning_path_id > learning_paths.id
+
+// Ref: user_learning_path_progress.user_id > users.id
+
+///////////////////////////////////////////////////////////
+//// INDEXES
+///////////////////////////////////////////////////////////
+
+//  

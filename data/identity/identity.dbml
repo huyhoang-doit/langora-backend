@@ -1,0 +1,432 @@
+Project LangoraIdentity {
+database_type: "PostgreSQL"
+Note: '''
+Identity Domain
+
+Responsibility:
+
+* Authentication
+* Authorization
+* Session Management
+* Email Verification
+* Password Reset
+* OAuth Integration
+
+Future Microservice:
+identity-service
+'''
+}
+
+///////////////////////////////////////////////////////////
+//// ENUMS
+///////////////////////////////////////////////////////////
+
+Enum user_status {
+PENDING
+ACTIVE
+SUSPENDED
+DELETED
+}
+
+Enum session_status {
+ACTIVE
+REVOKED
+EXPIRED
+}
+
+Enum token_type {
+ACCESS
+REFRESH
+}
+
+Enum provider_type {
+LOCAL
+GOOGLE
+GITHUB
+APPLE
+}
+
+Enum audit_action {
+CREATE
+UPDATE
+DELETE
+LOGIN
+LOGOUT
+PASSWORD_CHANGE
+ROLE_ASSIGN
+}
+
+///////////////////////////////////////////////////////////
+//// USERS
+///////////////////////////////////////////////////////////
+
+Table users {
+
+id uuid [pk]
+
+email varchar(255) [not null, unique]
+
+password_hash varchar(500)
+
+status user_status [not null, default: 'PENDING']
+
+email_verified boolean [not null, default: false]
+
+last_login_at timestamptz
+
+created_at timestamptz [not null]
+
+created_by uuid
+
+updated_at timestamptz
+
+updated_by uuid
+
+deleted_at timestamptz
+
+deleted_by uuid
+
+Note: '''
+Authentication Account
+
+One user account only.
+
+Business Key:
+email
+'''
+}
+
+///////////////////////////////////////////////////////////
+//// ROLES
+///////////////////////////////////////////////////////////
+
+Table roles {
+
+id uuid [pk]
+
+code varchar(100) [not null, unique]
+
+name varchar(255) [not null]
+
+description text
+
+is_system boolean [default: false]
+
+created_at timestamptz [not null]
+
+updated_at timestamptz
+
+Note: '''
+Examples
+
+SUPER_ADMIN
+ADMIN
+USER
+MODERATOR
+'''
+}
+
+///////////////////////////////////////////////////////////
+//// PERMISSIONS
+///////////////////////////////////////////////////////////
+
+Table permissions {
+
+id uuid [pk]
+
+code varchar(150) [not null, unique]
+
+name varchar(255)
+
+description text
+
+created_at timestamptz
+
+updated_at timestamptz
+
+Note: '''
+Examples
+
+USER_READ
+USER_WRITE
+
+LESSON_READ
+LESSON_WRITE
+
+VOCABULARY_READ
+VOCABULARY_WRITE
+'''
+}
+
+///////////////////////////////////////////////////////////
+//// ROLE PERMISSIONS
+///////////////////////////////////////////////////////////
+
+Table role_permissions {
+
+role_id uuid [not null]
+
+permission_id uuid [not null]
+
+granted_at timestamptz
+
+Note: '''
+Many-To-Many
+'''
+}
+
+///////////////////////////////////////////////////////////
+//// USER ROLES
+///////////////////////////////////////////////////////////
+
+Table user_roles {
+
+user_id uuid [not null]
+
+role_id uuid [not null]
+
+assigned_at timestamptz
+
+assigned_by uuid
+
+Note: '''
+Many-To-Many
+
+User can have multiple roles.
+'''
+}
+
+///////////////////////////////////////////////////////////
+//// USER SESSIONS
+///////////////////////////////////////////////////////////
+
+Table user_sessions {
+
+id uuid [pk]
+
+user_id uuid [not null]
+
+device_id varchar(255)
+
+device_name varchar(255)
+
+operating_system varchar(255)
+
+browser varchar(255)
+
+ip_address varchar(100)
+
+user_agent text
+
+status session_status [default: 'ACTIVE']
+
+last_activity_at timestamptz
+
+expired_at timestamptz
+
+created_at timestamptz
+
+Note: '''
+Multi Device Login
+
+Track active sessions.
+'''
+}
+
+///////////////////////////////////////////////////////////
+//// REFRESH TOKENS
+///////////////////////////////////////////////////////////
+
+Table refresh_tokens {
+
+id uuid [pk]
+
+user_id uuid [not null]
+
+session_id uuid [not null]
+
+token_hash varchar(500) [not null]
+
+revoked boolean [default: false]
+
+revoked_at timestamptz
+
+expires_at timestamptz
+
+created_at timestamptz
+
+Note: '''
+Store HASH only.
+
+Never store raw refresh token.
+'''
+}
+
+///////////////////////////////////////////////////////////
+//// EMAIL VERIFICATIONS
+///////////////////////////////////////////////////////////
+
+Table email_verifications {
+
+id uuid [pk]
+
+user_id uuid [not null]
+
+verification_token varchar(255)
+
+expired_at timestamptz
+
+verified_at timestamptz
+
+created_at timestamptz
+
+Note: '''
+Verify user email.
+'''
+}
+
+///////////////////////////////////////////////////////////
+//// PASSWORD RESETS
+///////////////////////////////////////////////////////////
+
+Table password_resets {
+
+id uuid [pk]
+
+user_id uuid [not null]
+
+reset_token varchar(255)
+
+expired_at timestamptz
+
+used_at timestamptz
+
+created_at timestamptz
+
+Note: '''
+Forgot Password Flow.
+'''
+}
+
+///////////////////////////////////////////////////////////
+//// OAUTH ACCOUNTS
+///////////////////////////////////////////////////////////
+
+Table oauth_accounts {
+
+id uuid [pk]
+
+user_id uuid [not null]
+
+provider provider_type [not null]
+
+provider_user_id varchar(255)
+
+email varchar(255)
+
+avatar_url text
+
+created_at timestamptz
+
+updated_at timestamptz
+
+Note: '''
+Social Login
+
+Google
+Github
+Apple
+'''
+}
+
+///////////////////////////////////////////////////////////
+//// LOGIN HISTORY
+///////////////////////////////////////////////////////////
+
+Table login_histories {
+
+id uuid [pk]
+
+user_id uuid [not null]
+
+session_id uuid
+
+ip_address varchar(100)
+
+user_agent text
+
+success boolean
+
+failure_reason text
+
+logged_at timestamptz
+
+Note: '''
+Security Audit
+'''
+}
+
+///////////////////////////////////////////////////////////
+//// SECURITY AUDIT LOG
+///////////////////////////////////////////////////////////
+
+Table security_audit_logs {
+
+id uuid [pk]
+
+user_id uuid
+
+action audit_action
+
+entity_name varchar(255)
+
+entity_id uuid
+
+old_value jsonb
+
+new_value jsonb
+
+ip_address varchar(100)
+
+created_at timestamptz
+
+Note: '''
+Audit Trail
+
+Security Investigation
+
+Compliance
+'''
+}
+
+///////////////////////////////////////////////////////////
+//// INDEXES
+///////////////////////////////////////////////////////////
+
+//  
+
+///////////////////////////////////////////////////////////
+//// RELATIONSHIPS
+///////////////////////////////////////////////////////////
+
+Ref: user_roles.user_id > users.id
+Ref: user_roles.role_id > roles.id
+
+Ref: role_permissions.role_id > roles.id
+Ref: role_permissions.permission_id > permissions.id
+
+Ref: user_sessions.user_id > users.id
+
+Ref: refresh_tokens.user_id > users.id
+Ref: refresh_tokens.session_id > user_sessions.id
+
+Ref: email_verifications.user_id > users.id
+
+Ref: password_resets.user_id > users.id
+
+Ref: oauth_accounts.user_id > users.id
+
+Ref: login_histories.user_id > users.id
+Ref: login_histories.session_id > user_sessions.id
+
+Ref: security_audit_logs.user_id > users.id

@@ -1,0 +1,418 @@
+Project LangoraUser {
+database_type: "PostgreSQL"
+
+Note: '''
+User Domain
+
+Responsibility:
+
+* User Profile
+* User Preferences
+* Learning Settings
+* Learning Goals
+* User Devices
+* User Feedback
+
+Future Microservice:
+user-service
+'''
+}
+
+///////////////////////////////////////////////////////////
+//// ENUMS
+///////////////////////////////////////////////////////////
+
+Enum gender_type {
+MALE
+FEMALE
+OTHER
+PREFER_NOT_TO_SAY
+}
+
+Enum learning_goal_type {
+TRAVEL
+WORK
+STUDY
+IELTS
+TOEIC
+JLPT
+COMMUNICATION
+BUSINESS
+OTHER
+}
+
+Enum proficiency_level {
+BEGINNER
+ELEMENTARY
+INTERMEDIATE
+UPPER_INTERMEDIATE
+ADVANCED
+}
+
+Enum device_type {
+WEB
+IOS
+ANDROID
+}
+
+///////////////////////////////////////////////////////////
+//// USER PROFILES
+///////////////////////////////////////////////////////////
+
+Table user_profiles {
+
+id uuid [pk]
+
+user_id uuid [
+not null,
+unique,
+note: 'FK -> identity.users.id'
+]
+
+full_name varchar(255)
+
+display_name varchar(255)
+
+avatar_url text
+
+date_of_birth date
+
+gender gender_type
+
+country_code varchar(10)
+
+timezone varchar(100)
+
+bio text
+
+created_at timestamptz [not null]
+
+updated_at timestamptz
+
+Note: '''
+Public profile information.
+'''
+}
+
+// Ref: user_profiles.user_id > users.id
+
+///////////////////////////////////////////////////////////
+//// USER PREFERENCES
+///////////////////////////////////////////////////////////
+
+Table user_preferences {
+
+id uuid [pk]
+
+user_id uuid [
+not null,
+unique,
+note: 'FK -> identity.users.id'
+]
+
+theme varchar(50)
+
+language_ui varchar(20)
+
+timezone varchar(100)
+
+email_notification_enabled boolean [default: true]
+
+push_notification_enabled boolean [default: true]
+
+reminder_enabled boolean [default: true]
+
+created_at timestamptz
+
+updated_at timestamptz
+
+Note: '''
+UI & application settings.
+'''
+}
+
+// Ref: user_preferences.user_id > users.id
+
+///////////////////////////////////////////////////////////
+//// USER LEARNING PROFILES
+///////////////////////////////////////////////////////////
+
+Table user_learning_profiles {
+
+id uuid [pk]
+
+user_id uuid [
+not null,
+note: 'FK -> identity.users.id'
+]
+
+target_language_id uuid [
+not null,
+note: 'FK -> learning.languages.id'
+]
+
+current_level_id uuid [
+note: 'FK -> learning.levels.id'
+]
+
+learning_goal learning_goal_type
+
+target_exam varchar(50)
+
+daily_goal_minutes integer [default: 15]
+
+daily_goal_words integer [default: 10]
+
+proficiency proficiency_level
+
+start_date date
+
+is_active boolean [default: true]
+
+created_at timestamptz
+
+updated_at timestamptz
+
+Note: '''
+One user can learn multiple languages.
+
+Example:
+
+English
+Japanese
+Chinese
+'''
+}
+
+// Ref: user_learning_profiles.user_id > users.id
+// Ref: user_learning_profiles.target_language_id > languages.id
+// Ref: user_learning_profiles.current_level_id > levels.id
+
+///////////////////////////////////////////////////////////
+//// USER LANGUAGE PROGRESS
+///////////////////////////////////////////////////////////
+
+Table user_language_progress {
+
+id uuid [pk]
+
+user_id uuid [
+not null,
+note: 'FK -> identity.users.id'
+]
+
+language_id uuid [
+not null,
+note: 'FK -> learning.languages.id'
+]
+
+current_level_id uuid [
+note: 'FK -> learning.levels.id'
+]
+
+total_learned_words integer [default: 0]
+
+total_mastered_words integer [default: 0]
+
+total_lessons_completed integer [default: 0]
+
+total_study_minutes integer [default: 0]
+
+current_streak integer [default: 0]
+
+longest_streak integer [default: 0]
+
+last_learning_date date
+
+created_at timestamptz
+
+updated_at timestamptz
+
+Note: '''
+Dashboard statistics.
+'''
+}
+
+// Ref: user_language_progress.user_id > users.id
+// Ref: user_language_progress.language_id > languages.id
+// Ref: user_language_progress.current_level_id > levels.id
+
+///////////////////////////////////////////////////////////
+//// USER LEARNING GOALS
+///////////////////////////////////////////////////////////
+
+Table user_learning_goals {
+
+id uuid [pk]
+
+user_id uuid [
+not null,
+note: 'FK -> identity.users.id'
+]
+
+target_language_id uuid [
+not null,
+note: 'FK -> learning.languages.id'
+]
+
+goal_title varchar(255)
+
+target_words integer
+
+target_lessons integer
+
+target_days integer
+
+start_date date
+
+end_date date
+
+completed boolean [default: false]
+
+created_at timestamptz
+
+updated_at timestamptz
+
+Note: '''
+User custom learning goals.
+'''
+}
+
+// Ref: user_learning_goals.user_id > users.id
+// Ref: user_learning_goals.target_language_id > languages.id
+
+///////////////////////////////////////////////////////////
+//// USER DEVICES
+///////////////////////////////////////////////////////////
+
+Table user_devices {
+
+id uuid [pk]
+
+user_id uuid [
+not null,
+note: 'FK -> identity.users.id'
+]
+
+device_type device_type
+
+device_token varchar(500)
+
+device_name varchar(255)
+
+operating_system varchar(255)
+
+app_version varchar(100)
+
+is_active boolean [default: true]
+
+last_active_at timestamptz
+
+created_at timestamptz
+
+Note: '''
+Device registry.
+
+Used for:
+
+* Push Notification
+* Security Tracking
+  '''
+  }
+
+// Ref: user_devices.user_id > users.id
+
+///////////////////////////////////////////////////////////
+//// USER BADGES
+///////////////////////////////////////////////////////////
+
+Table user_badges {
+
+id uuid [pk]
+
+user_id uuid [
+not null,
+note: 'FK -> identity.users.id'
+]
+
+badge_code varchar(100)
+
+badge_name varchar(255)
+
+icon_url text
+
+awarded_at timestamptz
+
+Note: '''
+Temporary table.
+
+Later moved to:
+gamification-service
+'''
+}
+
+// Ref: user_badges.user_id > users.id
+
+///////////////////////////////////////////////////////////
+//// USER REPORTS
+///////////////////////////////////////////////////////////
+
+Table user_reports {
+
+id uuid [pk]
+
+user_id uuid [
+not null,
+note: 'FK -> identity.users.id'
+]
+
+category varchar(100)
+
+title varchar(255)
+
+description text
+
+status varchar(50)
+
+resolved_at timestamptz
+
+created_at timestamptz
+
+Note: '''
+User feedback.
+
+Categories:
+
+* AI Error
+* Content Error
+* Bug Report
+* Feature Request
+  '''
+  }
+
+// Ref: user_reports.user_id > users.id
+
+///////////////////////////////////////////////////////////
+//// INDEXES
+///////////////////////////////////////////////////////////
+
+// Indexes {
+
+// (user_profiles.user_id) [unique]
+
+// (user_preferences.user_id) [unique]
+
+// (user_learning_profiles.user_id)
+
+// (user_learning_profiles.target_language_id)
+
+// (user_language_progress.user_id)
+
+// (user_language_progress.language_id)
+
+// (user_learning_goals.user_id)
+
+// (user_devices.user_id)
+
+// (user_reports.user_id)
+// }

@@ -1,0 +1,485 @@
+Project LangoraWriting {
+  database_type: "PostgreSQL"
+
+  Note: '''
+  Writing Domain
+
+  Responsibility:
+  - Writing Practice
+  - Writing Exercises
+  - Sentence Translation
+  - AI Feedback
+  - Writing Progress
+  - Hint System
+  - Dictionary Usage
+  - Writing Achievements
+
+  Future Microservice:
+  writing-service
+  '''
+}
+
+///////////////////////////////////////////////////////////
+//// ENUMS
+///////////////////////////////////////////////////////////
+
+Enum writing_level_code {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+Enum writing_content_type_code {
+  EMAIL
+  DIARY
+  ESSAY
+  ARTICLE
+  REPORT
+  STORY
+}
+
+Enum writing_session_status {
+  IN_PROGRESS
+  SUBMITTED
+  COMPLETED
+  ABANDONED
+}
+
+Enum hint_type {
+  VOCABULARY
+  GRAMMAR
+  SENTENCE_STRUCTURE
+  FULL_SUGGESTION
+}
+
+///////////////////////////////////////////////////////////
+//// WRITING LEVELS
+///////////////////////////////////////////////////////////
+
+Table writing_levels {
+
+  id uuid [pk]
+
+  code writing_level_code [unique]
+
+  name varchar(100)
+
+  description text
+
+  display_order integer
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  '''
+}
+
+///////////////////////////////////////////////////////////
+//// WRITING CONTENT TYPES
+///////////////////////////////////////////////////////////
+
+Table writing_content_types {
+
+  id uuid [pk]
+
+  code writing_content_type_code [unique]
+
+  name varchar(100)
+
+  icon_url text
+
+  description text
+
+  display_order integer
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  EMAIL
+  DIARY
+  ESSAY
+  ARTICLE
+  REPORT
+  STORY
+  '''
+}
+
+///////////////////////////////////////////////////////////
+//// WRITING TOPICS
+///////////////////////////////////////////////////////////
+
+Table writing_topics {
+
+  id uuid [pk]
+
+  code varchar(100) [unique]
+
+  name varchar(255)
+
+  description text
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  PERSONAL
+  BUSINESS
+  EDUCATION
+  TRAVEL
+  TECHNOLOGY
+  '''
+}
+
+///////////////////////////////////////////////////////////
+//// WRITING EXERCISES
+///////////////////////////////////////////////////////////
+
+Table writing_exercises {
+
+  id uuid [pk]
+
+  language_id uuid [
+    not null,
+    note: 'FK -> learning.languages.id'
+  ]
+
+  level_id uuid [not null]
+
+  content_type_id uuid [not null]
+
+  topic_id uuid [not null]
+
+  title varchar(500)
+
+  summary text
+
+  thumbnail_url text
+
+  total_sentences integer
+
+  estimated_minutes integer
+
+  credits_reward integer [default: 0]
+
+  xp_reward integer [default: 0]
+
+  is_active boolean [default: true]
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  Exercise card shown
+  in exercise listing page
+  '''
+}
+
+// Ref: writing_exercises.language_id > languages.id
+Ref: writing_exercises.level_id > writing_levels.id
+Ref: writing_exercises.content_type_id > writing_content_types.id
+Ref: writing_exercises.topic_id > writing_topics.id
+
+///////////////////////////////////////////////////////////
+//// WRITING EXERCISE SENTENCES
+///////////////////////////////////////////////////////////
+
+Table writing_exercise_sentences {
+
+  id uuid [pk]
+
+  exercise_id uuid [not null]
+
+  sentence_order integer [not null]
+
+  source_text text [not null]
+
+  target_text text
+
+  vocabulary_hints jsonb
+
+  grammar_hints jsonb
+
+  difficulty_score decimal(5,2)
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  Paragraph is split into sentences.
+
+  User translates sentence-by-sentence.
+  '''
+}
+
+Ref: writing_exercise_sentences.exercise_id > writing_exercises.id
+
+///////////////////////////////////////////////////////////
+//// WRITING SESSIONS
+///////////////////////////////////////////////////////////
+
+Table writing_sessions {
+
+  id uuid [pk]
+
+  user_id uuid [
+    not null,
+    note: 'FK -> identity.users.id'
+  ]
+
+  exercise_id uuid [not null]
+
+  current_sentence_order integer [default: 1]
+
+  status writing_session_status
+
+  total_score decimal(10,2)
+
+  grammar_score decimal(10,2)
+
+  vocabulary_score decimal(10,2)
+
+  fluency_score decimal(10,2)
+
+  accuracy_score decimal(10,2)
+
+  credits_earned integer [default: 0]
+
+  xp_earned integer [default: 0]
+
+  started_at timestamptz
+
+  submitted_at timestamptz
+
+  completed_at timestamptz
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  One writing attempt.
+
+  Resume supported.
+  '''
+}
+
+Ref: writing_sessions.exercise_id > writing_exercises.id
+
+// Ref: writing_sessions.user_id > users.id
+
+///////////////////////////////////////////////////////////
+//// WRITING SENTENCE ANSWERS
+///////////////////////////////////////////////////////////
+
+Table writing_sentence_answers {
+
+  id uuid [pk]
+
+  session_id uuid [not null]
+
+  sentence_id uuid [not null]
+
+  user_answer text
+
+  ai_score decimal(10,2)
+
+  grammar_score decimal(10,2)
+
+  vocabulary_score decimal(10,2)
+
+  fluency_score decimal(10,2)
+
+  accuracy_score decimal(10,2)
+
+  submitted_at timestamptz
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  User answer
+  for one sentence.
+  '''
+}
+
+Ref: writing_sentence_answers.session_id > writing_sessions.id
+Ref: writing_sentence_answers.sentence_id > writing_exercise_sentences.id
+
+///////////////////////////////////////////////////////////
+//// WRITING AI FEEDBACKS
+///////////////////////////////////////////////////////////
+
+Table writing_ai_feedbacks {
+
+  id uuid [pk]
+
+  answer_id uuid [not null]
+
+  ai_provider varchar(100)
+
+  ai_model varchar(100)
+
+  overall_feedback text
+
+  grammar_feedback text
+
+  vocabulary_feedback text
+
+  fluency_feedback text
+
+  suggested_answer text
+
+  correction_json jsonb
+
+  processing_time_ms integer
+
+  created_at timestamptz
+
+  Note: '''
+  AI feedback
+  displayed in right panel.
+  '''
+}
+
+Ref: writing_ai_feedbacks.answer_id > writing_sentence_answers.id
+
+///////////////////////////////////////////////////////////
+//// WRITING DICTIONARY LOOKUPS
+///////////////////////////////////////////////////////////
+
+Table writing_dictionary_lookups {
+
+  id uuid [pk]
+
+  session_id uuid [not null]
+
+  word varchar(255)
+
+  lookup_count integer [default: 1]
+
+  last_lookup_at timestamptz
+
+  created_at timestamptz
+
+  Note: '''
+  Dictionary usage tracking.
+  '''
+}
+
+Ref: writing_dictionary_lookups.session_id > writing_sessions.id
+
+///////////////////////////////////////////////////////////
+//// WRITING HINT USAGES
+///////////////////////////////////////////////////////////
+
+Table writing_hint_usages {
+
+  id uuid [pk]
+
+  session_id uuid [not null]
+
+  sentence_id uuid [not null]
+
+  hint_type hint_type
+
+  credits_cost integer [default: 0]
+
+  used_at timestamptz
+
+  created_at timestamptz
+
+  Note: '''
+  Hint usage tracking.
+  '''
+}
+
+Ref: writing_hint_usages.session_id > writing_sessions.id
+
+Ref: writing_hint_usages.sentence_id > writing_exercise_sentences.id
+
+///////////////////////////////////////////////////////////
+//// WRITING ACHIEVEMENTS
+///////////////////////////////////////////////////////////
+
+Table writing_achievements {
+
+  id uuid [pk]
+
+  session_id uuid [not null]
+
+  achievement_code varchar(100)
+
+  achievement_name varchar(255)
+
+  description text
+
+  awarded_at timestamptz
+
+  created_at timestamptz
+
+  Note: '''
+  BRIGHT_MIND
+
+  PERFECT_GRAMMAR
+
+  FAST_WRITER
+
+  NO_HINT_USED
+  '''
+}
+
+Ref: writing_achievements.session_id > writing_sessions.id
+
+///////////////////////////////////////////////////////////
+//// INDEXES
+///////////////////////////////////////////////////////////
+
+// Indexes {
+
+//   (writing_levels.code) [unique]
+
+//   (writing_content_types.code) [unique]
+
+//   (writing_topics.code) [unique]
+
+//   (writing_exercises.level_id)
+
+//   (writing_exercises.content_type_id)
+
+//   (writing_exercises.topic_id)
+
+//   (writing_exercise_sentences.exercise_id)
+
+//   (writing_exercise_sentences.sentence_order)
+
+//   (writing_sessions.user_id)
+
+//   (writing_sessions.exercise_id)
+
+//   (writing_sessions.status)
+
+//   (writing_sentence_answers.session_id)
+
+//   (writing_sentence_answers.sentence_id)
+
+//   (writing_ai_feedbacks.answer_id)
+
+//   (writing_dictionary_lookups.session_id)
+
+//   (writing_hint_usages.session_id)
+
+//   (writing_hint_usages.sentence_id)
+
+//   (writing_achievements.session_id)
+// }

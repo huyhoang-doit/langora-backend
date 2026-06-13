@@ -1,0 +1,383 @@
+Project LangoraVocabulary {
+  database_type: "PostgreSQL"
+
+  Note: '''
+  Vocabulary Domain
+
+  Responsibility:
+  - Vocabulary Management
+  - Vocabulary Topics
+  - Examples
+  - Pronunciations
+  - Synonyms
+  - Antonyms
+  - Lesson Vocabulary Mapping
+
+  Future Microservice:
+  vocabulary-service
+  '''
+}
+
+///////////////////////////////////////////////////////////
+//// ENUMS
+///////////////////////////////////////////////////////////
+
+Enum vocabulary_status {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+Enum difficulty_level {
+  BEGINNER
+  ELEMENTARY
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+Enum pronunciation_type {
+  US
+  UK
+  AU
+  OTHER
+}
+
+///////////////////////////////////////////////////////////
+//// VOCABULARY TOPICS
+///////////////////////////////////////////////////////////
+
+Table vocabulary_topics {
+
+  id uuid [pk]
+
+  language_id uuid [
+    not null,
+    note: 'FK -> learning.languages.id'
+  ]
+
+  code varchar(100) [unique]
+
+  name varchar(255)
+
+  description text
+
+  icon_url text
+
+  display_order integer
+
+  is_active boolean [default: true]
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  Food
+  Travel
+  Business
+  Family
+  Technology
+  '''
+}
+
+// Ref: vocabulary_topics.language_id > languages.id
+
+///////////////////////////////////////////////////////////
+//// VOCABULARIES
+///////////////////////////////////////////////////////////
+
+Table vocabularies {
+
+  id uuid [pk]
+
+  language_id uuid [
+    not null,
+    note: 'FK -> learning.languages.id'
+  ]
+
+  topic_id uuid [not null]
+
+  word varchar(255) [not null]
+
+  normalized_word varchar(255)
+
+  meaning text
+
+  ipa varchar(255)
+
+  phonetic varchar(255)
+
+  difficulty difficulty_level
+
+  frequency_rank integer
+
+  image_url text
+
+  status vocabulary_status [default: 'ACTIVE']
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  Master Vocabulary Table
+  '''
+}
+
+Ref: vocabularies.topic_id > vocabulary_topics.id
+
+// Ref: vocabularies.language_id > languages.id
+
+///////////////////////////////////////////////////////////
+//// VOCABULARY PRONUNCIATIONS
+///////////////////////////////////////////////////////////
+
+Table vocabulary_pronunciations {
+
+  id uuid [pk]
+
+  vocabulary_id uuid [not null]
+
+  pronunciation_type pronunciation_type
+
+  audio_url text
+
+  speaker_name varchar(255)
+
+  created_at timestamptz
+
+  Note: '''
+  US Audio
+  UK Audio
+  '''
+}
+
+Ref: vocabulary_pronunciations.vocabulary_id > vocabularies.id
+
+///////////////////////////////////////////////////////////
+//// VOCABULARY EXAMPLES
+///////////////////////////////////////////////////////////
+
+Table vocabulary_examples {
+
+  id uuid [pk]
+
+  vocabulary_id uuid [not null]
+
+  example_sentence text
+
+  translation text
+
+  explanation text
+
+  created_at timestamptz
+
+  updated_at timestamptz
+}
+
+Ref: vocabulary_examples.vocabulary_id > vocabularies.id
+
+///////////////////////////////////////////////////////////
+//// VOCABULARY SYNONYMS
+///////////////////////////////////////////////////////////
+
+Table vocabulary_synonyms {
+
+  vocabulary_id uuid [not null]
+
+  synonym_vocabulary_id uuid [not null]
+
+  created_at timestamptz
+}
+
+Ref: vocabulary_synonyms.vocabulary_id > vocabularies.id
+Ref: vocabulary_synonyms.synonym_vocabulary_id > vocabularies.id
+
+///////////////////////////////////////////////////////////
+//// VOCABULARY ANTONYMS
+///////////////////////////////////////////////////////////
+
+Table vocabulary_antonyms {
+
+  vocabulary_id uuid [not null]
+
+  antonym_vocabulary_id uuid [not null]
+
+  created_at timestamptz
+}
+
+Ref: vocabulary_antonyms.vocabulary_id > vocabularies.id
+Ref: vocabulary_antonyms.antonym_vocabulary_id > vocabularies.id
+
+///////////////////////////////////////////////////////////
+//// VOCABULARY TAGS
+///////////////////////////////////////////////////////////
+
+Table vocabulary_tags {
+
+  id uuid [pk]
+
+  code varchar(100) [unique]
+
+  name varchar(255)
+
+  description text
+
+  created_at timestamptz
+}
+
+///////////////////////////////////////////////////////////
+//// VOCABULARY TAG MAPPING
+///////////////////////////////////////////////////////////
+
+Table vocabulary_tag_mappings {
+
+  vocabulary_id uuid [not null]
+
+  tag_id uuid [not null]
+
+  created_at timestamptz
+}
+
+Ref: vocabulary_tag_mappings.vocabulary_id > vocabularies.id
+Ref: vocabulary_tag_mappings.tag_id > vocabulary_tags.id
+
+///////////////////////////////////////////////////////////
+//// LESSON VOCABULARIES
+///////////////////////////////////////////////////////////
+
+Table lesson_vocabularies {
+
+  lesson_id uuid [
+    not null,
+    note: 'FK -> learning.lessons.id'
+  ]
+
+  vocabulary_id uuid [not null]
+
+  display_order integer
+
+  is_required boolean [default: true]
+
+  created_at timestamptz
+}
+
+Ref: lesson_vocabularies.vocabulary_id > vocabularies.id
+
+// Ref: lesson_vocabularies.lesson_id > lessons.id
+
+///////////////////////////////////////////////////////////
+//// USER VOCABULARY BOOKMARKS
+///////////////////////////////////////////////////////////
+
+Table user_vocabulary_bookmarks {
+
+  id uuid [pk]
+
+  user_id uuid [
+    not null,
+    note: 'FK -> identity.users.id'
+  ]
+
+  vocabulary_id uuid [not null]
+
+  bookmarked_at timestamptz
+
+  Note: '''
+  Saved Vocabulary
+  Favorite Words
+  '''
+}
+
+Ref: user_vocabulary_bookmarks.vocabulary_id > vocabularies.id
+
+// Ref: user_vocabulary_bookmarks.user_id > users.id
+
+///////////////////////////////////////////////////////////
+//// USER CUSTOM VOCABULARIES
+///////////////////////////////////////////////////////////
+
+Table user_custom_vocabularies {
+
+  id uuid [pk]
+
+  user_id uuid [
+    not null,
+    note: 'FK -> identity.users.id'
+  ]
+
+  language_id uuid [
+    not null,
+    note: 'FK -> learning.languages.id'
+  ]
+
+  word varchar(255)
+
+  meaning text
+
+  note text
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  Personal Vocabulary
+  User-created words
+  '''
+}
+
+// Ref: user_custom_vocabularies.user_id > users.id
+// Ref: user_custom_vocabularies.language_id > languages.id
+
+///////////////////////////////////////////////////////////
+//// VOCABULARY COLLECTIONS
+///////////////////////////////////////////////////////////
+
+Table vocabulary_collections {
+
+  id uuid [pk]
+
+  user_id uuid [
+    not null,
+    note: 'FK -> identity.users.id'
+  ]
+
+  title varchar(255)
+
+  description text
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  User Word Lists
+  '''
+}
+
+// Ref: vocabulary_collections.user_id > users.id
+
+///////////////////////////////////////////////////////////
+//// VOCABULARY COLLECTION ITEMS
+///////////////////////////////////////////////////////////
+
+Table vocabulary_collection_items {
+
+  collection_id uuid [not null]
+
+  vocabulary_id uuid [not null]
+
+  added_at timestamptz
+}
+
+Ref: vocabulary_collection_items.collection_id > vocabulary_collections.id
+
+Ref: vocabulary_collection_items.vocabulary_id > vocabularies.id
+
+///////////////////////////////////////////////////////////
+//// INDEXES
+///////////////////////////////////////////////////////////
+
+//  
