@@ -1,11 +1,8 @@
 package com.langora.identity.domain.entity;
 
-import java.util.Set;
+import java.time.*;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -18,11 +15,20 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Role {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String id;
+
+    String code;
+
     String name;
 
     String description;
 
-    @ManyToMany
-    Set<Permission> permissions;
+    Boolean isSystem;
+
+    java.time.OffsetDateTime createdAt;
+
+    java.time.OffsetDateTime updatedAt;
 }

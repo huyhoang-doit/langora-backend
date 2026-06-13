@@ -1,9 +1,10 @@
 package com.langora.identity.domain.entity;
 
-import java.time.LocalDate;
-import java.util.Set;
+import java.time.*;
 
 import jakarta.persistence.*;
+
+import com.langora.identity.domain.enums.UserStatus;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -16,16 +17,31 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    String username;
-    String password;
-    String firstName;
-    String lastName;
-    LocalDate dob;
+    String email;
 
-    @ManyToMany
-    Set<Role> roles;
+    String passwordHash;
+
+    @Enumerated(EnumType.STRING)
+    UserStatus status;
+
+    Boolean emailVerified;
+
+    java.time.OffsetDateTime lastLoginAt;
+
+    java.time.OffsetDateTime createdAt;
+
+    String createdBy;
+
+    java.time.OffsetDateTime updatedAt;
+
+    String updatedBy;
+
+    java.time.OffsetDateTime deletedAt;
+
+    String deletedBy;
 }

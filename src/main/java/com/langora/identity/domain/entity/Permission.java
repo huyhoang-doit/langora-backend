@@ -1,8 +1,8 @@
 package com.langora.identity.domain.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import java.time.*;
+
+import jakarta.persistence.*;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -15,8 +15,18 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Permission {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String id;
+
+    String code;
+
     String name;
 
     String description;
+
+    java.time.OffsetDateTime createdAt;
+
+    java.time.OffsetDateTime updatedAt;
 }

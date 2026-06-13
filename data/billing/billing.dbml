@@ -1,0 +1,481 @@
+Project LangoraBilling {
+
+  database_type: "PostgreSQL"
+
+  Note: '''
+  =======================================================
+
+  BILLING DOMAIN
+
+  Responsibility
+
+  - Credit Packages
+  - Payment Processing
+  - User Wallet
+  - Credit Ledger
+  - Credit Consumption
+  - Credit Rewards
+  - Refund Management
+
+  Future Service
+
+  billing-service
+
+  Core Flow
+
+  User pays money
+  ↓
+  Receive Credits
+  ↓
+  Credits stored in Wallet
+  ↓
+  User spends Credits
+  ↓
+  Ledger records transaction
+
+  =======================================================
+  '''
+}
+
+///////////////////////////////////////////////////////////
+//// ENUMS
+///////////////////////////////////////////////////////////
+
+Enum payment_provider {
+  VNPAY
+  MOMO
+  STRIPE
+  PAYOS
+}
+
+Enum payment_status {
+  PENDING
+  PROCESSING
+  SUCCESS
+  FAILED
+  CANCELLED
+  EXPIRED
+  REFUNDED
+}
+
+Enum wallet_transaction_type {
+  TOPUP
+  REWARD
+  REFUND
+  ADJUSTMENT
+}
+
+Enum credit_action_type {
+
+  WRITING_FEEDBACK
+
+  AI_TUTOR_CHAT
+
+  VOCABULARY_EXPLANATION
+
+  GRAMMAR_CORRECTION
+
+  SENTENCE_EXPLANATION
+
+  HINT_USAGE
+
+  DAILY_REWARD
+
+  ACHIEVEMENT_REWARD
+
+  ADMIN_ADJUSTMENT
+
+  PACKAGE_PURCHASE
+
+}
+
+///////////////////////////////////////////////////////////
+//// CREDIT PACKAGES
+///////////////////////////////////////////////////////////
+
+Table credit_packages {
+
+  id uuid [pk]
+
+  code varchar(100) [unique]
+
+  name varchar(255)
+
+  description text
+
+  credits integer
+
+  bonus_credits integer [default: 0]
+
+  price decimal(15,2)
+
+  currency varchar(10) [default: 'VND']
+
+  sort_order integer
+
+  is_active boolean [default: true]
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  Example:
+
+  STARTER
+
+  100 Credits
+
+  49,000 VND
+  '''
+}
+
+///////////////////////////////////////////////////////////
+//// USER WALLETS
+///////////////////////////////////////////////////////////
+
+Table user_wallets {
+
+  id uuid [pk]
+
+  user_id uuid [
+    unique,
+    note: 'FK -> identity.users.id'
+  ]
+
+  available_credits bigint [default: 0]
+
+  total_topup_credits bigint [default: 0]
+
+  total_reward_credits bigint [default: 0]
+
+  total_spent_credits bigint [default: 0]
+
+  total_refunded_credits bigint [default: 0]
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  One wallet per user.
+  '''
+}
+
+// Ref: user_wallets.user_id > users.id
+
+///////////////////////////////////////////////////////////
+//// PAYMENTS
+///////////////////////////////////////////////////////////
+
+Table payments {
+
+  id uuid [pk]
+
+  user_id uuid [
+    not null,
+    note: 'FK -> identity.users.id'
+  ]
+
+  package_id uuid [not null]
+
+  provider payment_provider
+
+  status payment_status
+
+  amount decimal(15,2)
+
+  currency varchar(10)
+
+  provider_transaction_id varchar(255)
+
+  payment_url text
+
+  provider_response jsonb
+
+  paid_at timestamptz
+
+  expired_at timestamptz
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  Real money transaction.
+  '''
+}
+
+Ref: payments.package_id > credit_packages.id
+
+// Ref: payments.user_id > users.id
+
+///////////////////////////////////////////////////////////
+//// WALLET TRANSACTIONS
+///////////////////////////////////////////////////////////
+
+Table wallet_transactions {
+
+  id uuid [pk]
+
+  wallet_id uuid [not null]
+
+  payment_id uuid
+
+  transaction_type wallet_transaction_type
+
+  credits integer
+
+  balance_before bigint
+
+  balance_after bigint
+
+  description text
+
+  metadata jsonb
+
+  created_at timestamptz
+
+  Note: '''
+  Credit topup
+  Credit reward
+  Credit refund
+  '''
+}
+
+Ref: wallet_transactions.wallet_id > user_wallets.id
+
+Ref: wallet_transactions.payment_id > payments.id
+
+///////////////////////////////////////////////////////////
+//// CREDIT LEDGER
+///////////////////////////////////////////////////////////
+
+Table credit_ledgers {
+
+  id uuid [pk]
+
+  wallet_id uuid [not null]
+
+  action_type credit_action_type
+
+  reference_id uuid
+
+  credits_change integer
+
+  balance_before bigint
+
+  balance_after bigint
+
+  metadata jsonb
+
+  created_at timestamptz
+
+  Note: '''
+  Immutable transaction log.
+
+  Every credit increase/decrease
+  must create one record.
+  '''
+}
+
+Ref: credit_ledgers.wallet_id > user_wallets.id
+
+///////////////////////////////////////////////////////////
+//// CREDIT CONSUMPTION RULES
+///////////////////////////////////////////////////////////
+
+Table credit_consumption_rules {
+
+  id uuid [pk]
+
+  action_type credit_action_type
+
+  credits_cost integer
+
+  is_active boolean [default: true]
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  WRITING_FEEDBACK = 2
+
+  AI_TUTOR_CHAT = 5
+
+  VOCABULARY_EXPLANATION = 1
+
+  GRAMMAR_CORRECTION = 1
+  '''
+}
+
+///////////////////////////////////////////////////////////
+//// CREDIT REWARD RULES
+///////////////////////////////////////////////////////////
+
+Table credit_reward_rules {
+
+  id uuid [pk]
+
+  reward_code varchar(100) [unique]
+
+  reward_name varchar(255)
+
+  credits_reward integer
+
+  daily_limit integer
+
+  is_active boolean [default: true]
+
+  created_at timestamptz
+
+  updated_at timestamptz
+
+  Note: '''
+  DAILY_LOGIN
+
+  COMPLETE_WRITING
+
+  PERFECT_SCORE
+
+  WEEKLY_STREAK
+  '''
+}
+
+///////////////////////////////////////////////////////////
+//// CREDIT REWARD HISTORIES
+///////////////////////////////////////////////////////////
+
+Table credit_reward_histories {
+
+  id uuid [pk]
+
+  wallet_id uuid [not null]
+
+  reward_rule_id uuid [not null]
+
+  credits_reward integer
+
+  reference_id uuid
+
+  awarded_at timestamptz
+
+  Note: '''
+  Track reward distribution.
+  '''
+}
+
+Ref: credit_reward_histories.wallet_id > user_wallets.id
+
+Ref: credit_reward_histories.reward_rule_id > credit_reward_rules.id
+
+///////////////////////////////////////////////////////////
+//// CREDIT EXPIRATIONS
+///////////////////////////////////////////////////////////
+
+Table credit_expirations {
+
+  id uuid [pk]
+
+  wallet_id uuid [not null]
+
+  credits integer
+
+  expires_at timestamptz
+
+  expired_at timestamptz
+
+  is_expired boolean [default: false]
+
+  created_at timestamptz
+
+  Note: '''
+  Optional feature.
+
+  Example:
+
+  Promotional credits
+  expire after 30 days.
+  '''
+}
+
+Ref: credit_expirations.wallet_id > user_wallets.id
+
+///////////////////////////////////////////////////////////
+//// PAYMENT WEBHOOK LOGS
+///////////////////////////////////////////////////////////
+
+Table payment_webhook_logs {
+
+  id uuid [pk]
+
+  provider payment_provider
+
+  payment_id uuid
+
+  event_name varchar(255)
+
+  payload jsonb
+
+  processed boolean
+
+  processed_at timestamptz
+
+  created_at timestamptz
+
+  Note: '''
+  VNPay Callback
+
+  Momo IPN
+
+  Stripe Webhook
+
+  Used for troubleshooting.
+  '''
+}
+
+Ref: payment_webhook_logs.payment_id > payments.id
+
+///////////////////////////////////////////////////////////
+//// INDEXES
+///////////////////////////////////////////////////////////
+
+// Indexes {
+
+//   (credit_packages.code) [unique]
+
+//   (credit_packages.is_active)
+
+//   (user_wallets.user_id) [unique]
+
+//   (payments.user_id)
+
+//   (payments.status)
+
+//   (payments.provider)
+
+//   (payments.provider_transaction_id)
+
+//   (wallet_transactions.wallet_id)
+
+//   (wallet_transactions.payment_id)
+
+//   (credit_ledgers.wallet_id)
+
+//   (credit_ledgers.action_type)
+
+//   (credit_ledgers.reference_id)
+
+//   (credit_reward_rules.reward_code) [unique]
+
+//   (credit_reward_histories.wallet_id)
+
+//   (credit_expirations.wallet_id)
+
+//   (credit_expirations.expires_at)
+
+//   (payment_webhook_logs.payment_id)
+
+//   (payment_webhook_logs.provider)
+// }

@@ -1,0 +1,14 @@
+package com.langora.billing.domain.enums;
+
+public enum CreditActionType {
+    WRITING_FEEDBACK,
+    AI_TUTOR_CHAT,
+    VOCABULARY_EXPLANATION,
+    GRAMMAR_CORRECTION,
+    SENTENCE_EXPLANATION,
+    HINT_USAGE,
+    DAILY_REWARD,
+    ACHIEVEMENT_REWARD,
+    ADMIN_ADJUSTMENT,
+    PACKAGE_PURCHASE
+}

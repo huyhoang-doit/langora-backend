@@ -1,72 +1,87 @@
-# Tổng quan Kiến trúc dự án Identity Service
+# Tổng quan Kiến trúc dự án Langora Backend
 
-Dựa trên cấu trúc mã nguồn và các tệp tin cấu hình, đây là bản phân tích toàn diện về kiến trúc, các tính năng đã được thực hiện, các model (thực thể) và cấu hình của dự án `identity-service-spring-boot`.
+Tài liệu này cung cấp cái nhìn toàn diện về kiến trúc, cấu trúc module, và các nguyên tắc thiết kế được áp dụng trong dự án **Langora Backend** tính tới thời điểm hiện tại.
 
-## 1. Kiến trúc dự án
-Dự án được xây dựng theo kiến trúc **Layered Architecture (Kiến trúc phân lớp)** chuẩn của Spring Boot, bao gồm các thành phần chính:
-- **Controller Layer (`controller`)**: Nơi tiếp nhận các HTTP Request từ client. (Ví dụ: `UserController`, `AuthenticationController`).
-- **Service Layer (`service`)**: Chứa logic nghiệp vụ lõi của ứng dụng. (Ví dụ: `UserService`, `AuthenticationService`).
-- **Repository Layer (`repository`)**: Chịu trách nhiệm tương tác với cơ sở dữ liệu thông qua Spring Data JPA.
-- **Data Access & Entity Layer (`entity`, `dto`)**: Bao gồm các lớp ánh xạ bảng trong cơ sở dữ liệu (`Entity`) và các đối tượng truyền tải dữ liệu (`DTO`).
-- **Mapper (`mapper`)**: Sử dụng thư viện `MapStruct` để chuyển đổi qua lại giữa `Entity` và `DTO` một cách tự động và gọn gàng.
-- **Security & Configuration Layer (`configuration`)**: Xử lý xác thực (Authentication), phân quyền (Authorization) và cấu hình ứng dụng.
-- **Exception Handling (`exception`)**: Quản lý lỗi tập trung để trả về định dạng response chuẩn cho phía client.
+## 1. Kiến trúc Hệ thống: Modular Monolith
+Dự án đã được nâng cấp từ kiến trúc nguyên khối truyền thống (Layered Architecture) sang kiến trúc **Modular Monolith** kết hợp với tư tưởng **Clean Architecture**.
 
----
+**Lý do chọn Modular Monolith:**
+- Cho phép chia tách các miền nghiệp vụ (Domain) thành các **Module độc lập**.
+- Giữ được sự đơn giản của một ứng dụng Monolith (dễ deploy, quản lý transaction nguyên khối) trong giai đoạn đầu.
+- Sẵn sàng và cực kỳ dễ dàng để tách thành các Microservices độc lập trong tương lai khi dự án scale up (mở rộng).
 
-## 2. Các Model (Entity) hiện có
-Dự án tập trung vào tính năng định danh và phân quyền, hiện tại đang bao gồm 4 mô hình chính:
+## 2. Các Module Nghiệp vụ (Domains)
+Hệ thống hiện tại được chia thành 6 module chính, mỗi module đảm nhận một miền nghiệp vụ (Bounded Context) riêng biệt. Tất cả các Entities đều được thiết kế đối chiếu chính xác 1-1 với DBML.
 
-1. **`User` (Người dùng)**:
-   - Lưu trữ thông tin tài khoản người dùng như tên đăng nhập, mật khẩu (đã băm), thông tin cá nhân.
-   - Có mối quan hệ với `Role`.
-2. **`Role` (Vai trò)**:
-   - Đại diện cho các nhóm quyền (Ví dụ: `ADMIN`, `USER`).
-   - Có mối quan hệ n-n (Many-to-Many) với `Permission`.
-3. **`Permission` (Quyền hạn)**:
-   - Các quyền hạn cụ thể nhỏ nhất (Ví dụ: `CREATE_DATA`, `UPDATE_DATA`, `APPROVE_POST`).
-4. **`InvalidatedToken` (Token đã hủy)**:
-   - Lưu trữ các ID của JWT token đã bị người dùng logout hoặc bị vô hiệu hóa, nhằm chặn việc sử dụng lại token cũ.
+1. **Identity Module (`com.langora.identity`)**
+   - Nhiệm vụ: Xác thực (Authentication), phân quyền (Authorization), và quản lý an ninh.
+   - Các Entities chính: `User` (lưu credentials như email, password_hash), `Role`, `Permission`, `UserSession`, `RefreshToken`, `OauthAccount`, `SecurityAuditLog`.
 
----
+2. **User Module (`com.langora.user`)**
+   - Nhiệm vụ: Quản lý hồ sơ, cài đặt cá nhân, và mục tiêu học tập của người dùng.
+   - Các Entities chính: `UserProfile`, `UserPreference`, `UserLearningGoal`, `UserLanguageProgress`, `UserDevice`.
 
-## 3. Các Service và Chức năng đã thực hiện
-Dự án đã xây dựng xong một bộ luồng Xác thực và Quản lý Người dùng rất đầy đủ:
+3. **Learning Module (`com.langora.learning`)**
+   - Nhiệm vụ: Quản lý cấu trúc của chương trình học (Ngôn ngữ -> Lộ trình -> Unit -> Bài học).
+   - Các Entities chính: `Language`, `LearningPath`, `Unit`, `Lesson`, `UserLessonProgress`.
 
-* **`AuthenticationService`**:
-  - Đăng nhập (Tạo JWT Token).
-  - Xác thực Token (Introspect).
-  - Làm mới Token (Refresh Token).
-  - Đăng xuất (Vô hiệu hóa Token bằng cách đưa vào bảng `InvalidatedToken`).
-* **`UserService`**:
-  - Đăng ký/Tạo mới tài khoản người dùng (Create User).
-  - Lấy thông tin người dùng.
-  - Cập nhật thông tin và mật khẩu.
-  - Cấp/Thu hồi Role cho người dùng.
-* **`RoleService` & `PermissionService`**:
-  - Quản lý (Tạo, xem, xóa) các vai trò (Roles) và quyền (Permissions) động trong hệ thống.
+4. **Vocabulary Module (`com.langora.vocabulary`)**
+   - Nhiệm vụ: Xây dựng kho từ vựng đa dạng bao gồm ngữ nghĩa, phát âm, từ đồng nghĩa/trái nghĩa.
+   - Các Entities chính: `Vocabulary`, `VocabularyTopic`, `VocabularyExample`, `VocabularySynonym`, `UserCustomVocabulary`, `VocabularyCollection`.
+
+5. **Writing Module (`com.langora.writing`)**
+   - Nhiệm vụ: Quản lý tính năng luyện viết tiếng Anh, chấm điểm và AI Tutor.
+   - Các Entities chính: `WritingTopic`, `WritingExercise`, `WritingSession`, `WritingAiFeedback`, `WritingHintUsage`.
+
+6. **Billing Module (`com.langora.billing`)**
+   - Nhiệm vụ: Xử lý thanh toán, nạp/rút tín dụng (credits), phần thưởng và ví điện tử.
+   - Các Entities chính: `CreditPackage`, `UserWallet`, `Payment`, `CreditLedger`, `WalletTransaction`, `CreditRewardRule`.
 
 ---
 
-## 4. Các cấu hình nổi bật (Configuration)
+## 3. Cấu trúc nội bộ của một Module
+Mỗi module đều phải tuân thủ nghiêm ngặt cấu trúc gói (package) phân lớp sau đây:
 
-Hệ thống đã thiết lập sẵn các cấu hình bảo mật và vận hành theo tiêu chuẩn rất hiện đại:
+```text
+com.langora.<module_name>/
+├── controller/         # Lớp giao tiếp với bên ngoài qua REST API (@RestController).
+├── application/        # Lớp logic nghiệp vụ (Use cases).
+│    ├── service/       # Xử lý logic (@Service). Không phụ thuộc HTTP request.
+│    ├── exception/     # Các custom exception riêng của module.
+│    └── validator/     # Logic kiểm tra dữ liệu đầu vào.
+├── domain/             # Lớp trung tâm chứa business model.
+│    ├── entity/        # Các JPA Entities ánh xạ database.
+│    ├── repository/    # Interfaces định nghĩa việc thao tác dữ liệu (extends JpaRepository).
+│    └── enums/         # Enums được sử dụng trong Entity.
+├── infrastructure/     # Lớp tương tác với framework, thư viện bên thứ 3 hoặc module khác.
+│    ├── mapper/        # MapStruct Interfaces chuyển đổi Entity <-> DTO.
+│    └── configuration/ # Cấu hình Spring Boot riêng cho module.
+└── dto/                # Data Transfer Objects.
+     ├── request/       # Dữ liệu từ Client gửi lên.
+     └── response/      # Dữ liệu trả về cho Client.
+```
 
-* **Spring Security & OAuth2 (`SecurityConfig`)**:
-  - Vô hiệu hóa CSRF (phù hợp cho REST API).
-  - Cấu hình phân quyền `MethodSecurity` giúp dễ dàng chặn quyền bằng các Annotation như `@PreAuthorize("hasRole('ADMIN')")` ở cấp độ method.
-  - Cấu hình OAuth2 Resource Server để tự động parse JWT từ Header `Authorization: Bearer <token>`.
-  - Thiết lập các **Public Endpoints** không cần xác thực: `/users` (đăng ký), `/auth/token` (đăng nhập), `/auth/introspect`, `/auth/logout`, `/auth/refresh`.
+## 4. Các Nguyên tắc Thiết kế Bắt Buộc (Strict Rules)
 
-* **Custom JWT Decoding (`CustomJwtDecoder`)**:
-  - Ghi đè logic giải mã JWT mặc định để thực hiện kiểm tra thêm xem Token đó có nằm trong bảng `InvalidatedToken` (đã đăng xuất) hay chưa. Nếu đã bị vô hiệu hóa sẽ từ chối truy cập.
+1. **Nguyên tắc cô lập Module (Loose Coupling):**
+   - Các Entity thuộc các module khác nhau **TUYỆT ĐỐI KHÔNG** được tạo quan hệ thông qua Hibernate `@ManyToOne` hay `@OneToOne`.
+   - Để trỏ đến Entity của module khác, chúng ta chỉ sử dụng biến dạng `String` (để lưu UUID). 
+   - *Ví dụ:* Bảng `user_wallets` (trong Billing module) trỏ đến `users` (trong Identity module) bằng biến `String userId;` chứ không phải `User user;`.
 
-* **Khởi tạo dữ liệu tự động (`ApplicationInitConfig`)**:
-  - Mỗi khi chạy ứng dụng, hệ thống sẽ kiểm tra xem tài khoản `admin` đã tồn tại chưa. Nếu chưa, nó sẽ **tự động tạo một tài khoản admin mặc định** để nhà phát triển/quản trị viên có thể đăng nhập ngay mà không cần can thiệp vào Database.
+2. **Dữ liệu xuyên suốt (DTO & MapStruct):**
+   - Entity là tài sản nội bộ của Module. **Không bao giờ trả Entity trực tiếp ra ngoài HTTP Response.**
+   - Mọi dữ liệu vào/ra đều phải đi qua các class `DTO` (Data Transfer Object).
+   - Sử dụng thư viện `MapStruct` để ánh xạ tự động dữ liệu từ Entity sang DTO và ngược lại.
 
-* **Database (PostgreSQL & H2)**:
-  - Cấu hình chính sử dụng **PostgreSQL** (`application.yaml`).
-  - Môi trường Unit Test / Integration Test dùng **H2 In-Memory Database** (với `MODE=PostgreSQL`) hoặc **Testcontainers** (Docker PostgreSQL) cho các test chân thực nhất (`test.properties`, `UserControllerIntegrationTest`).
+3. **Shared Module (`com.langora.shared`):**
+   - Chứa những cấu hình, thư viện, hoặc logic tiện ích mà mọi module đều sử dụng.
+   - Ví dụ: `GlobalExceptionHandler` (bắt lỗi tập trung), `ApiResponse` (định dạng response trả về cho mọi API), cấu hình Security JWT.
 
-* **Exception Handling**:
-  - Cấu hình `JwtAuthenticationEntryPoint` để bắt và trả về thông báo lỗi đẹp mắt khi gặp mã `401 Unauthorized`.
+4. **Quản lý khoá chính (Primary Key):**
+   - Tất cả các khoá chính (ID) đều sử dụng kiểu `UUID` để phân tán dữ liệu và bảo mật thông tin (không để lộ số lượng bản ghi bằng ID tự tăng auto-increment).
+   - Trong Entity, ID được khai báo là `String` với cấu hình sinh mã:
+     ```java
+     @Id
+     @GeneratedValue(strategy = GenerationType.UUID)
+     String id;
+     ```
