@@ -16,6 +16,10 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LessonPrerequisite {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String id;
+
     String lessonId;
 
     String prerequisiteLessonId;

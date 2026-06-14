@@ -16,6 +16,10 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class VocabularyTagMapping {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String id;
+
     String vocabularyId;
 
     String tagId;

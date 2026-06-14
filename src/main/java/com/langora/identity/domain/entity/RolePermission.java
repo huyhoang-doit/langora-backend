@@ -16,6 +16,10 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RolePermission {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String id;
+
     String roleId;
 
     String permissionId;
