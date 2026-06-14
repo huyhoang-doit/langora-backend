@@ -1,9 +1,6 @@
 package com.langora.shared.exception;
 
 import java.util.Map;
-import java.util.Objects;
-
-import jakarta.validation.ConstraintViolation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -25,7 +22,7 @@ public class GlobalExeptionHandler {
     ResponseEntity<ApiResponse> exceptionHandler(RuntimeException exception) {
         log.error("Exception: ", exception);
         ApiResponse apiResponse = new ApiResponse();
-        apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXEPTION.getCode());
+        apiResponse.setSuccess(false);
         apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXEPTION.getMsg());
         return ResponseEntity.badRequest().body(apiResponse);
     }
@@ -36,7 +33,7 @@ public class GlobalExeptionHandler {
         ApiResponse apiResponse = new ApiResponse();
         ErrorCode errorCode = exception.getErrorCode();
 
-        apiResponse.setCode(errorCode.getCode());
+        apiResponse.setSuccess(false);
         apiResponse.setMessage(errorCode.getMsg());
         return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
     }
@@ -44,31 +41,22 @@ public class GlobalExeptionHandler {
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     ResponseEntity<ApiResponse> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException exception) {
         log.error("Exception: ", exception);
-        ApiResponse apiResponse = new ApiResponse();
 
-        String enumKey = exception.getFieldError().getDefaultMessage();
-        ErrorCode errorCode = ErrorCode.INVALID_KEY;
+        java.util.List<com.langora.shared.dto.response.ApiError> errors =
+                exception.getBindingResult().getFieldErrors().stream()
+                        .map(fieldError -> com.langora.shared.dto.response.ApiError.builder()
+                                .field(fieldError.getField())
+                                .message(fieldError.getDefaultMessage())
+                                .build())
+                        .toList();
 
-        Map<String, Object> attributes = null;
-        try {
-            errorCode = ErrorCode.valueOf(enumKey);
+        ApiResponse apiResponse = ApiResponse.builder()
+                .success(false)
+                .message("Validation failed")
+                .errors(errors)
+                .build();
 
-            var constraintViolation =
-                    exception.getBindingResult().getAllErrors().getFirst().unwrap(ConstraintViolation.class);
-
-            attributes = constraintViolation.getConstraintDescriptor().getAttributes();
-
-            log.info(attributes.toString());
-
-        } catch (IllegalArgumentException e) {
-
-        }
-
-        apiResponse.setCode(errorCode.getCode());
-        apiResponse.setMessage(
-                Objects.nonNull(attributes) ? mapAttribute(errorCode.getMsg(), attributes) : errorCode.getMsg());
-
-        return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
+        return ResponseEntity.badRequest().body(apiResponse);
     }
 
     @ExceptionHandler(value = AuthorizationDeniedException.class)
@@ -77,7 +65,7 @@ public class GlobalExeptionHandler {
 
         return ResponseEntity.status(errorCode.getStatusCode())
                 .body(ApiResponse.builder()
-                        .code(errorCode.getCode())
+                        .success(false)
                         .message(errorCode.getMsg())
                         .build());
     }

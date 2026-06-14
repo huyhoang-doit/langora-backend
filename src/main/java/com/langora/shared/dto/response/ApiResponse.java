@@ -1,5 +1,8 @@
 package com.langora.shared.dto.response;
 
+import java.time.OffsetDateTime;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.*;
@@ -12,9 +15,18 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
+
     @Builder.Default
-    int code = 1000;
+    boolean success = true;
 
     String message;
-    T result;
+
+    T data;
+
+    Object meta;
+
+    List<ApiError> errors;
+
+    @Builder.Default
+    OffsetDateTime timestamp = OffsetDateTime.now();
 }

@@ -13,6 +13,7 @@
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/billing/domain/enums/PaymentProvider.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/billing/domain/enums/PaymentStatus.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/billing/domain/enums/WalletTransactionType.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/controller/admin/AdminAuthController.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/domain/entity/EmailVerification.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/domain/entity/LoginHistory.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/domain/entity/OauthAccount.java
@@ -30,6 +31,15 @@
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/domain/enums/SessionStatus.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/domain/enums/TokenType.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/domain/enums/UserStatus.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/dto/request/AdminLoginRequest.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/dto/request/RoleCreationRequest.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/dto/request/RoleUpdateRequest.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/dto/response/AdminAuthResponse.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/dto/response/AdminProfileResponse.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/repository/RoleRepository.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/repository/UserRepository.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/repository/UserRoleRepository.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/service/AuthService.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/learning/domain/entity/Language.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/learning/domain/entity/LearningPath.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/learning/domain/entity/Lesson.java
@@ -48,6 +58,8 @@
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/shared/configuration/InitBean.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/shared/configuration/JwtAuthenticationEntryPoint.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/shared/configuration/SecurityConfig.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/shared/constant/ApiEndpoint.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/shared/dto/response/ApiError.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/shared/dto/response/ApiResponse.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/shared/enums/Role.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/shared/exception/AppException.java

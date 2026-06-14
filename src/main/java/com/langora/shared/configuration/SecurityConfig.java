@@ -17,9 +17,17 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENPOINTS = {
-        "/users", "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"
+    private final String[] PUBLIC_POST_ENDPOINTS = {
+        "/users",
+        "/auth/token",
+        "/auth/introspect",
+        "/auth/logout",
+        "/auth/refresh",
+        com.langora.shared.constant.ApiEndpoint.Admin.Auth.BASE
+                + com.langora.shared.constant.ApiEndpoint.Admin.Auth.LOGIN
     };
+
+    private final String[] PUBLIC_GET_ENDPOINTS = {"/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"};
 
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
@@ -28,7 +36,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(
                 authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
-                        .requestMatchers(HttpMethod.POST, PUBLIC_ENPOINTS)
+                        .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS)
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS)
                         .permitAll()
                         .anyRequest()
                         .authenticated());
