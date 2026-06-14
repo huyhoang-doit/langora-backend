@@ -1,9 +1,13 @@
 package com.langora.identity.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.langora.identity.domain.entity.Permission;
 
 @Repository
-public interface PermissionRepository extends JpaRepository<Permission, String> {}
+public interface PermissionRepository extends JpaRepository<Permission, String> {
+    Optional<Permission> findByCode(String code);
+}
