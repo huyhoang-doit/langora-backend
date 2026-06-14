@@ -10,4 +10,6 @@ import com.langora.identity.domain.entity.UserRole;
 @Repository
 public interface UserRoleRepository extends JpaRepository<UserRole, String> {
     List<UserRole> findByUserId(String userId);
+
+    List<UserRole> findByRoleId(String roleId);
 }

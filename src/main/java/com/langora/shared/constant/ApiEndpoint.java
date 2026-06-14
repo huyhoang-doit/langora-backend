@@ -17,6 +17,11 @@ public final class ApiEndpoint {
 
         public static final class Roles {
             public static final String BASE = Admin.BASE + "/roles";
+            public static final String ID = "/{id}";
+        }
+
+        public static final class Permissions {
+            public static final String BASE = Admin.BASE + "/permissions";
         }
     }
 }
