@@ -1,15 +1,19 @@
 package com.langora.identity.service;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.langora.identity.domain.entity.User;
 import com.langora.identity.domain.entity.UserRole;
+import com.langora.identity.domain.enums.UserStatus;
+import com.langora.identity.dto.request.UserCreationRequest;
 import com.langora.identity.dto.request.UserRoleAssignRequest;
 import com.langora.identity.dto.request.UserStatusUpdateRequest;
 import com.langora.identity.dto.response.LoginHistoryResponse;
@@ -36,6 +40,43 @@ public class UserService {
     RoleRepository roleRepository;
     LoginHistoryRepository loginHistoryRepository;
     UserMapper userMapper;
+    PasswordEncoder passwordEncoder;
+
+    @Transactional
+    public UserResponse createUser(UserCreationRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
+
+        User user = User.builder()
+                .email(request.getEmail())
+                .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .status(UserStatus.ACTIVE)
+                .emailVerified(false)
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
+                .build();
+
+        user = userRepository.save(user);
+
+        if (request.getRoleIds() != null && !request.getRoleIds().isEmpty()) {
+            // Validate that all roles exist
+            for (String roleId : request.getRoleIds()) {
+                if (!roleRepository.existsById(roleId)) {
+                    throw new AppException(ErrorCode.INVALID_KEY); // ROLE_NOT_FOUND
+                }
+            }
+
+            final String userId = user.getId();
+            List<UserRole> newRoles = request.getRoleIds().stream()
+                    .map(roleId -> UserRole.builder().userId(userId).roleId(roleId).build())
+                    .toList();
+
+            userRoleRepository.saveAll(newRoles);
+        }
+
+        return userMapper.toUserResponse(user);
+    }
 
     public Page<User> getUsers(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);

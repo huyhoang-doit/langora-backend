@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.langora.identity.domain.entity.User;
+import com.langora.identity.dto.request.UserCreationRequest;
 import com.langora.identity.dto.request.UserRoleAssignRequest;
 import com.langora.identity.dto.request.UserStatusUpdateRequest;
 import com.langora.identity.dto.response.LoginHistoryResponse;
@@ -37,6 +38,14 @@ public class AdminUserController {
 
     UserService userService;
     UserMapper userMapper;
+
+    @PostMapping
+    public ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
+        return ApiResponse.<UserResponse>builder()
+                .data(userService.createUser(request))
+                .message("Created user successfully")
+                .build();
+    }
 
     @GetMapping
     public ApiResponse<List<UserResponse>> getUsers(
