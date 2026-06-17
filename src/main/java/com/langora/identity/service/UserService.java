@@ -74,7 +74,7 @@ public class UserService {
             // Validate that all roles exist
             for (String roleId : request.getRoleIds()) {
                 if (!roleRepository.existsById(roleId)) {
-                    throw new AppException(ErrorCode.INVALID_KEY); // ROLE_NOT_FOUND
+                    throw new AppException(ErrorCode.ROLE_NOT_FOUND);
                 }
             }
 
@@ -127,14 +127,14 @@ public class UserService {
         UserResponse response = userRepository
                 .findById(id)
                 .map(userMapper::toUserResponse)
-                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY)); // USER_NOT_FOUND
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         enrichUserResponses(List.of(response));
         return response;
     }
 
     public List<Role> getUserRoles(String id) {
         if (!userRepository.existsById(id)) {
-            throw new AppException(ErrorCode.INVALID_KEY);
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
         List<UserRole> userRoles = userRoleRepository.findByUserId(id);
         List<String> roleIds = userRoles.stream().map(UserRole::getRoleId).collect(Collectors.toList());
@@ -171,7 +171,7 @@ public class UserService {
 
     @Transactional
     public UserResponse updateStatus(String id, UserStatusUpdateRequest request) {
-        User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
+        User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         user.setStatus(request.getStatus());
         user.setUpdatedAt(OffsetDateTime.now());
@@ -183,7 +183,7 @@ public class UserService {
 
     @Transactional
     public UserResponse updatePassword(String id, UserPasswordUpdateRequest request) {
-        User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
+        User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
         user.setUpdatedAt(OffsetDateTime.now());
@@ -196,13 +196,13 @@ public class UserService {
     @Transactional
     public void assignRoles(String id, UserRoleAssignRequest request) {
         if (!userRepository.existsById(id)) {
-            throw new AppException(ErrorCode.INVALID_KEY);
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
 
         // Validate that all roles exist
         for (String roleId : request.getRoleIds()) {
             if (!roleRepository.existsById(roleId)) {
-                throw new AppException(ErrorCode.INVALID_KEY); // ROLE_NOT_FOUND
+                throw new AppException(ErrorCode.ROLE_NOT_FOUND);
             }
         }
 
@@ -220,7 +220,7 @@ public class UserService {
 
     public List<LoginHistoryResponse> getLoginHistory(String id) {
         if (!userRepository.existsById(id)) {
-            throw new AppException(ErrorCode.INVALID_KEY);
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
         return loginHistoryRepository.findByUserIdOrderByLoggedAtDesc(id).stream()
                 .map(userMapper::toLoginHistoryResponse)

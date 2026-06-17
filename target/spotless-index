@@ -47,7 +47,7 @@ src/main/java/com/langora/identity/dto/response/AdminProfileResponse.java 2026-0
 src/main/java/com/langora/identity/dto/response/LoginHistoryResponse.java 2026-06-14T08:48:51.621102203Z
 src/main/java/com/langora/identity/dto/response/PermissionResponse.java 2026-06-14T06:09:49.771609408Z
 src/main/java/com/langora/identity/dto/response/RoleDetailResponse.java 2026-06-14T06:09:53.809640644Z
-src/main/java/com/langora/identity/dto/response/RoleResponse.java 2026-06-14T06:09:51.789754797Z
+src/main/java/com/langora/identity/dto/response/RoleResponse.java 2026-06-17T18:20:46.412022071Z
 src/main/java/com/langora/identity/dto/response/UserResponse.java 2026-06-17T16:49:27.671653968Z
 src/main/java/com/langora/identity/infrastructure/mapper/PermissionMapper.java 2026-06-14T06:10:24.454829107Z
 src/main/java/com/langora/identity/infrastructure/mapper/RoleMapper.java 2026-06-14T06:12:27.351515862Z
@@ -57,11 +57,11 @@ src/main/java/com/langora/identity/repository/PermissionRepository.java 2026-06-
 src/main/java/com/langora/identity/repository/RolePermissionRepository.java 2026-06-14T06:12:10.624299656Z
 src/main/java/com/langora/identity/repository/RoleRepository.java 2026-06-14T03:49:45.810603377Z
 src/main/java/com/langora/identity/repository/UserRepository.java 2026-06-17T18:01:01.529121127Z
-src/main/java/com/langora/identity/repository/UserRoleRepository.java 2026-06-16T17:34:28.107637018Z
+src/main/java/com/langora/identity/repository/UserRoleRepository.java 2026-06-17T18:20:53.923519133Z
 src/main/java/com/langora/identity/service/AuthService.java 2026-06-14T04:14:32.643395360Z
 src/main/java/com/langora/identity/service/PermissionService.java 2026-06-14T06:10:58.177760667Z
-src/main/java/com/langora/identity/service/RoleService.java 2026-06-14T06:12:10.714484862Z
-src/main/java/com/langora/identity/service/UserService.java 2026-06-17T18:01:01.651503380Z
+src/main/java/com/langora/identity/service/RoleService.java 2026-06-17T18:21:20.711731961Z
+src/main/java/com/langora/identity/service/UserService.java 2026-06-17T18:29:29.815310861Z
 src/main/java/com/langora/learning/domain/entity/Language.java 2026-06-13T16:18:08.294145168Z
 src/main/java/com/langora/learning/domain/entity/LearningPath.java 2026-06-13T16:18:08.246999314Z
 src/main/java/com/langora/learning/domain/entity/Lesson.java 2026-06-13T16:18:08.256817952Z
@@ -87,7 +87,7 @@ src/main/java/com/langora/shared/dto/response/ApiResponse.java 2026-06-14T04:44:
 src/main/java/com/langora/shared/dto/response/PageMeta.java 2026-06-14T08:48:04.852212827Z
 src/main/java/com/langora/shared/enums/Role.java 2026-06-13T14:37:08.329676937Z
 src/main/java/com/langora/shared/exception/AppException.java 2026-06-13T14:37:08.330954288Z
-src/main/java/com/langora/shared/exception/ErrorCode.java 2026-06-13T14:37:08.330251903Z
+src/main/java/com/langora/shared/exception/ErrorCode.java 2026-06-17T18:29:15.953324696Z
 src/main/java/com/langora/shared/exception/GlobalExeptionHandler.java 2026-06-17T13:38:18.410514656Z
 src/main/java/com/langora/shared/validator/DobConstraint.java 2026-06-13T14:37:08.328630673Z
 src/main/java/com/langora/shared/validator/DobValidator.java 2026-06-13T14:37:08.329308224Z
