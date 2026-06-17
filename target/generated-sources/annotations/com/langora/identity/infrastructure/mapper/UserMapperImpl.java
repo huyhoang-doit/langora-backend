@@ -23,6 +23,7 @@ public class UserMapperImpl implements UserMapper {
         UserResponse.UserResponseBuilder userResponse = UserResponse.builder();
 
         userResponse.id( user.getId() );
+        userResponse.userCode( user.getUserCode() );
         userResponse.email( user.getEmail() );
         userResponse.status( user.getStatus() );
         userResponse.emailVerified( user.getEmailVerified() );

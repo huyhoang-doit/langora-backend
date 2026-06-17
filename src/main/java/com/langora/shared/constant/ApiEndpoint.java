@@ -28,6 +28,7 @@ public final class ApiEndpoint {
             public static final String BASE = Admin.BASE + "/users";
             public static final String ID = "/{id}";
             public static final String STATUS = "/{id}/status";
+            public static final String PASSWORD = "/{id}/password";
             public static final String ROLES = "/{id}/roles";
             public static final String HISTORY = "/{id}/history";
         }

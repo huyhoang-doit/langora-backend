@@ -30,6 +30,7 @@ com/langora/identity/domain/entity/OauthAccount.class
 com/langora/user/domain/entity/UserProfile.class
 com/langora/identity/infrastructure/mapper/PermissionMapperImpl.class
 com/langora/identity/domain/entity/SecurityAuditLog.class
+com/langora/identity/dto/request/UserCreationRequest$UserCreationRequestBuilder.class
 com/langora/learning/domain/entity/LearningPath.class
 com/langora/identity/dto/response/LoginHistoryResponse.class
 com/langora/vocabulary/domain/enums/VocabularyStatus.class
@@ -103,6 +104,7 @@ com/langora/user/domain/entity/UserPreference.class
 com/langora/vocabulary/domain/entity/VocabularyExample$VocabularyExampleBuilder.class
 com/langora/vocabulary/domain/entity/VocabularyPronunciation.class
 com/langora/learning/domain/entity/UserUnitProgress.class
+com/langora/user/dto/request/UserProfileUpdateRequest$UserProfileUpdateRequestBuilder.class
 com/langora/learning/domain/enums/LanguageStatus.class
 com/langora/user/domain/entity/UserLearningGoal.class
 com/langora/vocabulary/domain/entity/Vocabulary$VocabularyBuilder.class
@@ -146,6 +148,7 @@ com/langora/identity/domain/entity/Role$RoleBuilder.class
 com/langora/learning/domain/entity/Language$LanguageBuilder.class
 com/langora/vocabulary/domain/entity/VocabularyTopic.class
 com/langora/identity/repository/PermissionRepository.class
+com/langora/identity/dto/request/UserCreationRequest.class
 com/langora/identity/dto/request/UserRoleAssignRequest.class
 com/langora/identity/dto/request/UserStatusUpdateRequest$UserStatusUpdateRequestBuilder.class
 com/langora/user/domain/entity/UserReport$UserReportBuilder.class
@@ -200,6 +203,7 @@ com/langora/vocabulary/domain/entity/UserCustomVocabulary$UserCustomVocabularyBu
 com/langora/user/domain/entity/UserDevice.class
 com/langora/billing/domain/entity/CreditLedger$CreditLedgerBuilder.class
 com/langora/identity/domain/entity/OauthAccount$OauthAccountBuilder.class
+com/langora/user/dto/request/UserProfileUpdateRequest.class
 com/langora/identity/domain/entity/PasswordReset$PasswordResetBuilder.class
 com/langora/identity/dto/request/UserRoleAssignRequest$UserRoleAssignRequestBuilder.class
 com/langora/identity/domain/enums/SessionStatus.class
@@ -225,6 +229,7 @@ com/langora/user/repository/UserProfileRepository.class
 com/langora/user/domain/entity/UserPreference$UserPreferenceBuilder.class
 com/langora/writting/domain/entity/WritingAiFeedback.class
 com/langora/shared/constant/ApiEndpoint$Admin.class
+com/langora/identity/dto/request/UserPasswordUpdateRequest.class
 com/langora/identity/service/RoleService.class
 com/langora/learning/domain/entity/UserUnitProgress$UserUnitProgressBuilder.class
 com/langora/learning/domain/entity/UserLessonProgress.class

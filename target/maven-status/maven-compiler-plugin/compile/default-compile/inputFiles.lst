@@ -37,6 +37,8 @@
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/dto/request/AdminLoginRequest.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/dto/request/RoleCreationRequest.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/dto/request/RoleUpdateRequest.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/dto/request/UserCreationRequest.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/dto/request/UserPasswordUpdateRequest.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/dto/request/UserRoleAssignRequest.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/dto/request/UserStatusUpdateRequest.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/identity/dto/response/AdminAuthResponse.java
@@ -101,6 +103,7 @@
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/user/domain/enums/GenderType.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/user/domain/enums/LearningGoalType.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/user/domain/enums/ProficiencyLevel.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/user/dto/request/UserProfileUpdateRequest.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/user/dto/response/UserProfileResponse.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/user/dto/response/UserProgressResponse.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/user/infrastructure/mapper/UserActivityMapper.java
