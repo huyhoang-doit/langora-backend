@@ -1,7 +1,9 @@
 package com.langora.user.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.langora.shared.service.FileStorageService;
 import com.langora.user.domain.entity.UserLanguageProgress;
 import com.langora.user.domain.entity.UserProfile;
 import com.langora.user.dto.request.UserProfileUpdateRequest;
@@ -23,6 +25,7 @@ public class UserActivityService {
     UserProfileRepository userProfileRepository;
     UserLanguageProgressRepository userLanguageProgressRepository;
     UserActivityMapper userActivityMapper;
+    FileStorageService fileStorageService;
 
     public UserProfileResponse getUserProfile(String userId) {
         UserProfile profile = userProfileRepository.findByUserId(userId).orElseGet(() -> {
@@ -76,6 +79,21 @@ public class UserActivityService {
         if (request.getBio() != null) profile.setBio(request.getBio());
 
         profile.setUpdatedAt(java.time.OffsetDateTime.now());
+        userProfileRepository.save(profile);
+
+        return userActivityMapper.toUserProfileResponse(profile);
+    }
+
+    public UserProfileResponse uploadAvatar(String userId, MultipartFile file) {
+        UserProfile profile = userProfileRepository.findByUserId(userId).orElseGet(() -> UserProfile.builder()
+                .userId(userId)
+                .createdAt(java.time.OffsetDateTime.now())
+                .build());
+
+        String avatarUrl = fileStorageService.uploadImage(file, "avatars");
+        profile.setAvatarUrl(avatarUrl);
+        profile.setUpdatedAt(java.time.OffsetDateTime.now());
+
         userProfileRepository.save(profile);
 
         return userActivityMapper.toUserProfileResponse(profile);

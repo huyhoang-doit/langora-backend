@@ -147,9 +147,7 @@ public class UserService {
         List<String> userIds = responses.stream().map(UserResponse::getId).collect(Collectors.toList());
 
         List<UserProfile> profiles = userProfileRepository.findByUserIdIn(userIds);
-        var profileMap = profiles.stream()
-                .filter(p -> p.getFullName() != null)
-                .collect(Collectors.toMap(UserProfile::getUserId, UserProfile::getFullName));
+        var profileMap = profiles.stream().collect(Collectors.toMap(UserProfile::getUserId, p -> p));
 
         // Fetch UserRoles
         List<UserRole> userRoles = userRoleRepository.findByUserIdIn(userIds);
@@ -164,7 +162,11 @@ public class UserService {
                         Collectors.mapping(ur -> roleMap.get(ur.getRoleId()), Collectors.toList())));
 
         for (UserResponse response : responses) {
-            response.setFullName(profileMap.getOrDefault(response.getId(), null));
+            UserProfile profile = profileMap.get(response.getId());
+            if (profile != null) {
+                response.setFullName(profile.getFullName());
+                response.setAvatarUrl(profile.getAvatarUrl());
+            }
             response.setRoles(userRoleMap.getOrDefault(response.getId(), List.of()));
         }
     }

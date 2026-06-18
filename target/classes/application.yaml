@@ -4,6 +4,10 @@ server:
     context-path: /langora
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
   application:
     name: langora-backend
   banner:
@@ -22,3 +26,8 @@ jwt:
   signerKey: "ci927jBnQ4GsVEqj6ClN77nEFVMbcK4ZDq79UA6StkxWkOZVHGHNZc2HnjoUwiCX"
   valid-duration: 36000 # in seconds
   refreshable-duration: 36000 # in seconds
+
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:langora-cloudinary}
+  api-key: ${CLOUDINARY_API_KEY:134994731934112}
+  api-secret: ${CLOUDINARY_API_SECRET:Dk2KO3nDf5Nv0h59SciMHGEPo8Q}

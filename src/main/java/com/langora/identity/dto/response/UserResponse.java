@@ -25,5 +25,6 @@ public class UserResponse {
     OffsetDateTime lastLoginAt;
     OffsetDateTime createdAt;
     String fullName;
+    String avatarUrl;
     java.util.List<String> roles;
 }
