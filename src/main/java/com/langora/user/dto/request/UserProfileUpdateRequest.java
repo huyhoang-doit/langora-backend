@@ -1,15 +1,10 @@
-package com.langora.identity.dto.response;
+package com.langora.user.dto.request;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import com.langora.user.domain.enums.GenderType;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
@@ -17,11 +12,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AdminProfileResponse {
-
-    String id;
-
-    String email;
+public class UserProfileUpdateRequest {
 
     String fullName;
 
@@ -38,8 +29,4 @@ public class AdminProfileResponse {
     String timezone;
 
     String bio;
-
-    List<String> roles;
-
-    List<String> permissions;
 }

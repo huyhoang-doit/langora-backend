@@ -22,6 +22,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    @Column(unique = true, length = 20)
+    String userCode;
+
+    @Column(unique = true, nullable = false)
     String email;
 
     String passwordHash;

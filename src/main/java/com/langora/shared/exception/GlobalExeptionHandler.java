@@ -7,6 +7,7 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.langora.shared.dto.response.ApiResponse;
 
@@ -19,7 +20,7 @@ public class GlobalExeptionHandler {
     private static final String MIN_ATTRIBUTE = "min";
 
     @ExceptionHandler(value = Exception.class)
-    ResponseEntity<ApiResponse> exceptionHandler(RuntimeException exception) {
+    ResponseEntity<ApiResponse> exceptionHandler(Exception exception) {
         log.error("Exception: ", exception);
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setSuccess(false);
@@ -36,6 +37,18 @@ public class GlobalExeptionHandler {
         apiResponse.setSuccess(false);
         apiResponse.setMessage(errorCode.getMsg());
         return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
+    }
+
+    @ExceptionHandler(value = MaxUploadSizeExceededException.class)
+    ResponseEntity<ApiResponse> maxUploadSizeExceededExceptionHandler(MaxUploadSizeExceededException exception) {
+        log.error("Exception: ", exception);
+        ErrorCode errorCode = ErrorCode.FILE_TOO_LARGE;
+
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(ApiResponse.builder()
+                        .success(false)
+                        .message(errorCode.getMsg())
+                        .build());
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)

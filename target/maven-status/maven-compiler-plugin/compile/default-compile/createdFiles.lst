@@ -30,6 +30,7 @@ com/langora/identity/domain/entity/OauthAccount.class
 com/langora/user/domain/entity/UserProfile.class
 com/langora/identity/infrastructure/mapper/PermissionMapperImpl.class
 com/langora/identity/domain/entity/SecurityAuditLog.class
+com/langora/identity/dto/request/UserCreationRequest$UserCreationRequestBuilder.class
 com/langora/learning/domain/entity/LearningPath.class
 com/langora/identity/dto/response/LoginHistoryResponse.class
 com/langora/vocabulary/domain/enums/VocabularyStatus.class
@@ -45,6 +46,7 @@ com/langora/LangoraApplication.class
 com/langora/identity/repository/RoleRepository.class
 com/langora/vocabulary/domain/entity/VocabularyTagMapping.class
 com/langora/identity/domain/entity/RolePermission$RolePermissionBuilder.class
+com/langora/shared/configuration/CloudinaryConfig.class
 com/langora/identity/domain/enums/UserStatus.class
 com/langora/writting/domain/entity/WritingContentType$WritingContentTypeBuilder.class
 com/langora/identity/domain/entity/Permission.class
@@ -78,6 +80,7 @@ com/langora/vocabulary/domain/entity/VocabularyCollection.class
 com/langora/writting/domain/enums/WritingContentTypeCode.class
 com/langora/vocabulary/domain/entity/VocabularyAntonym.class
 com/langora/billing/domain/enums/PaymentStatus.class
+com/langora/shared/service/FileStorageService.class
 com/langora/user/domain/entity/UserDevice$UserDeviceBuilder.class
 com/langora/billing/domain/entity/PaymentWebhookLog$PaymentWebhookLogBuilder.class
 com/langora/vocabulary/domain/entity/UserVocabularyBookmark.class
@@ -103,6 +106,7 @@ com/langora/user/domain/entity/UserPreference.class
 com/langora/vocabulary/domain/entity/VocabularyExample$VocabularyExampleBuilder.class
 com/langora/vocabulary/domain/entity/VocabularyPronunciation.class
 com/langora/learning/domain/entity/UserUnitProgress.class
+com/langora/user/dto/request/UserProfileUpdateRequest$UserProfileUpdateRequestBuilder.class
 com/langora/learning/domain/enums/LanguageStatus.class
 com/langora/user/domain/entity/UserLearningGoal.class
 com/langora/vocabulary/domain/entity/Vocabulary$VocabularyBuilder.class
@@ -110,6 +114,7 @@ com/langora/billing/domain/entity/WalletTransaction.class
 com/langora/vocabulary/domain/entity/VocabularySynonym.class
 com/langora/identity/domain/entity/PasswordReset.class
 com/langora/learning/domain/entity/LessonPrerequisite.class
+com/langora/shared/dto/response/FileUrlResponse$FileUrlResponseBuilder.class
 com/langora/identity/infrastructure/mapper/RoleMapper.class
 com/langora/vocabulary/domain/entity/VocabularyExample.class
 com/langora/user/domain/entity/UserLearningProfile.class
@@ -146,6 +151,7 @@ com/langora/identity/domain/entity/Role$RoleBuilder.class
 com/langora/learning/domain/entity/Language$LanguageBuilder.class
 com/langora/vocabulary/domain/entity/VocabularyTopic.class
 com/langora/identity/repository/PermissionRepository.class
+com/langora/identity/dto/request/UserCreationRequest.class
 com/langora/identity/dto/request/UserRoleAssignRequest.class
 com/langora/identity/dto/request/UserStatusUpdateRequest$UserStatusUpdateRequestBuilder.class
 com/langora/user/domain/entity/UserReport$UserReportBuilder.class
@@ -163,6 +169,7 @@ com/langora/identity/domain/entity/Role.class
 com/langora/billing/domain/entity/CreditLedger.class
 com/langora/vocabulary/domain/entity/VocabularyTag.class
 com/langora/writting/domain/entity/WritingLevel.class
+com/langora/shared/controller/FileController.class
 com/langora/vocabulary/domain/entity/VocabularyCollection$VocabularyCollectionBuilder.class
 com/langora/identity/infrastructure/mapper/UserMapper.class
 com/langora/identity/domain/entity/EmailVerification$EmailVerificationBuilder.class
@@ -180,6 +187,7 @@ com/langora/billing/domain/entity/Payment$PaymentBuilder.class
 com/langora/writting/domain/entity/WritingExercises.class
 com/langora/billing/domain/entity/WalletTransaction$WalletTransactionBuilder.class
 com/langora/writting/domain/entity/WritingSentenceAnswer$WritingSentenceAnswerBuilder.class
+com/langora/shared/dto/response/FileUrlResponse.class
 com/langora/user/domain/enums/GenderType.class
 com/langora/user/domain/entity/UserLanguageProgress$UserLanguageProgressBuilder.class
 com/langora/vocabulary/domain/entity/LessonVocabulary.class
@@ -200,6 +208,7 @@ com/langora/vocabulary/domain/entity/UserCustomVocabulary$UserCustomVocabularyBu
 com/langora/user/domain/entity/UserDevice.class
 com/langora/billing/domain/entity/CreditLedger$CreditLedgerBuilder.class
 com/langora/identity/domain/entity/OauthAccount$OauthAccountBuilder.class
+com/langora/user/dto/request/UserProfileUpdateRequest.class
 com/langora/identity/domain/entity/PasswordReset$PasswordResetBuilder.class
 com/langora/identity/dto/request/UserRoleAssignRequest$UserRoleAssignRequestBuilder.class
 com/langora/identity/domain/enums/SessionStatus.class
@@ -211,6 +220,7 @@ com/langora/writting/domain/entity/WritingExercises$WritingExercisesBuilder.clas
 com/langora/shared/dto/response/ApiError.class
 com/langora/user/service/UserActivityService.class
 com/langora/identity/domain/entity/EmailVerification.class
+com/langora/shared/service/impl/CloudinaryStorageServiceImpl.class
 com/langora/identity/domain/entity/UserRole$UserRoleBuilder.class
 com/langora/identity/dto/response/PermissionResponse$PermissionResponseBuilder.class
 com/langora/user/domain/entity/UserLearningGoal$UserLearningGoalBuilder.class
@@ -225,6 +235,7 @@ com/langora/user/repository/UserProfileRepository.class
 com/langora/user/domain/entity/UserPreference$UserPreferenceBuilder.class
 com/langora/writting/domain/entity/WritingAiFeedback.class
 com/langora/shared/constant/ApiEndpoint$Admin.class
+com/langora/identity/dto/request/UserPasswordUpdateRequest.class
 com/langora/identity/service/RoleService.class
 com/langora/learning/domain/entity/UserUnitProgress$UserUnitProgressBuilder.class
 com/langora/learning/domain/entity/UserLessonProgress.class

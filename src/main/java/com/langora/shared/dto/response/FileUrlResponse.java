@@ -1,4 +1,4 @@
-package com.langora.identity.dto.response;
+package com.langora.shared.dto.response;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,11 +12,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RoleResponse {
-    String id;
-    String code;
-    String name;
-    String description;
-    Boolean isSystem;
-    Long userCount;
+public class FileUrlResponse {
+    String url;
 }

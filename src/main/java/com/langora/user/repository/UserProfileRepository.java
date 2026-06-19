@@ -10,4 +10,6 @@ import com.langora.user.domain.entity.UserProfile;
 @Repository
 public interface UserProfileRepository extends JpaRepository<UserProfile, String> {
     Optional<UserProfile> findByUserId(String userId);
+
+    java.util.List<UserProfile> findByUserIdIn(java.util.List<String> userIds);
 }
