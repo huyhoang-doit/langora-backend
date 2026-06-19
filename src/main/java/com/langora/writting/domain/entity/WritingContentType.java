@@ -22,6 +22,8 @@ public class WritingContentType {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    String languageId;
+
     @Enumerated(EnumType.STRING)
     WritingContentTypeCode code;
 

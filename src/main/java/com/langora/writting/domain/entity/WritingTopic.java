@@ -20,6 +20,8 @@ public class WritingTopic {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    String languageId;
+
     String code;
 
     String name;

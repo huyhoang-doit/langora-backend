@@ -19,6 +19,9 @@ import com.langora.identity.repository.RolePermissionRepository;
 import com.langora.identity.repository.RoleRepository;
 import com.langora.identity.repository.UserRepository;
 import com.langora.identity.repository.UserRoleRepository;
+import com.langora.learning.domain.entity.Language;
+import com.langora.learning.domain.enums.LanguageStatus;
+import com.langora.learning.domain.repository.LanguageRepository;
 import com.langora.user.domain.entity.UserLanguageProgress;
 import com.langora.user.domain.entity.UserProfile;
 import com.langora.user.repository.UserLanguageProgressRepository;
@@ -45,7 +48,8 @@ public class ApplicationInitConfig {
             PermissionRepository permissionRepository,
             RolePermissionRepository rolePermissionRepository,
             UserProfileRepository userProfileRepository,
-            UserLanguageProgressRepository userLanguageProgressRepository) {
+            UserLanguageProgressRepository userLanguageProgressRepository,
+            LanguageRepository languageRepository) {
         return args -> {
             log.info("Checking and initializing default data (Roles, Permissions, Users)...");
 
@@ -190,6 +194,33 @@ public class ApplicationInitConfig {
                         .build());
 
                 log.warn("Member user created! Email: {}, Password: member123", memberEmail);
+            }
+
+            // 8. Initialize Languages
+            if (languageRepository.count() == 0) {
+                languageRepository.saveAll(List.of(
+                        Language.builder()
+                                .code("en")
+                                .name("English")
+                                .nativeName("English")
+                                .status(LanguageStatus.ACTIVE)
+                                .createdAt(OffsetDateTime.now())
+                                .build(),
+                        Language.builder()
+                                .code("ja")
+                                .name("Japanese")
+                                .nativeName("日本語")
+                                .status(LanguageStatus.ACTIVE)
+                                .createdAt(OffsetDateTime.now())
+                                .build(),
+                        Language.builder()
+                                .code("zh")
+                                .name("Chinese")
+                                .nativeName("中文")
+                                .status(LanguageStatus.ACTIVE)
+                                .createdAt(OffsetDateTime.now())
+                                .build()));
+                log.info("Initialized default languages: en, ja, zh");
             }
         };
     }
