@@ -46,6 +46,7 @@ public class AuthService {
     UserRoleRepository userRoleRepository;
     RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
+    com.langora.user.repository.UserProfileRepository userProfileRepository;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -103,9 +104,20 @@ public class AuthService {
                 .filter(code -> !code.isEmpty())
                 .collect(Collectors.toList());
 
+        com.langora.user.domain.entity.UserProfile profile =
+                userProfileRepository.findByUserId(userId).orElse(null);
+
         return AdminProfileResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
+                .fullName(profile != null ? profile.getFullName() : null)
+                .displayName(profile != null ? profile.getDisplayName() : null)
+                .avatarUrl(profile != null ? profile.getAvatarUrl() : null)
+                .dateOfBirth(profile != null ? profile.getDateOfBirth() : null)
+                .gender(profile != null ? profile.getGender() : null)
+                .countryCode(profile != null ? profile.getCountryCode() : null)
+                .timezone(profile != null ? profile.getTimezone() : null)
+                .bio(profile != null ? profile.getBio() : null)
                 .roles(roles)
                 .permissions(List.of()) // Pending Permissions implementation
                 .build();

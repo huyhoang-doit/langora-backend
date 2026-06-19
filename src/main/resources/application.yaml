@@ -27,7 +27,12 @@ jwt:
   valid-duration: 36000 # in seconds
   refreshable-duration: 36000 # in seconds
 
+#cloudinary:
+#  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+#  api-key: ${CLOUDINARY_API_KEY}
+#  api-secret: ${CLOUDINARY_API_SECRET}
+
 cloudinary:
-  cloud-name: ${CLOUDINARY_CLOUD_NAME}
-  api-key: ${CLOUDINARY_API_KEY}
-  api-secret: ${CLOUDINARY_API_SECRET}
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:langora-cloudinary}
+  api-key: ${CLOUDINARY_API_KEY:134994731934112}
+  api-secret: ${CLOUDINARY_API_SECRET:Dk2KO3nDf5Nv0h59SciMHGEPo8Q}
