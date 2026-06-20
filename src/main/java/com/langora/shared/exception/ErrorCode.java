@@ -10,6 +10,7 @@ public enum ErrorCode {
     // -- COMMON --
     UNCATEGORIZED_EXEPTION(9999, "Uncategorized Exception Error", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_KEY(9998, "Invalid Key Error", HttpStatus.BAD_REQUEST),
+    BULK_IMPORT_FAILED(9997, "Bulk import failed", HttpStatus.BAD_REQUEST),
     FILE_UPLOAD_FAILED(9001, "Failed to upload file", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_TOO_LARGE(9002, "File size exceeds the maximum limit (20MB)", HttpStatus.BAD_REQUEST),
     RESOURCE_NOT_FOUND(1009, "Resource not found", HttpStatus.NOT_FOUND),

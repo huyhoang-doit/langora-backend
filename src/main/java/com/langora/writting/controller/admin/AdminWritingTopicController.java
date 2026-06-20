@@ -35,10 +35,11 @@ public class AdminWritingTopicController {
     @GetMapping
     public ApiResponse<java.util.List<WritingTopicResponse>> getTopics(
             @PathVariable String langId,
+            @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        Page<WritingTopicResponse> topicPage = writingTopicService.getTopics(langId, page, size);
+        Page<WritingTopicResponse> topicPage = writingTopicService.getTopics(langId, search, page, size);
 
         PageMeta meta = PageMeta.builder()
                 .page(page)
@@ -58,6 +59,13 @@ public class AdminWritingTopicController {
             @PathVariable String langId, @RequestBody @Valid WritingTopicRequest request) {
         WritingTopicResponse result = writingTopicService.createTopic(langId, request);
         return ApiResponse.<WritingTopicResponse>builder().data(result).build();
+    }
+
+    @PostMapping("/bulk")
+    public ApiResponse<Void> bulkImportTopics(
+            @PathVariable String langId, @RequestBody java.util.List<WritingTopicRequest> requests) {
+        writingTopicService.bulkImportTopics(langId, requests);
+        return ApiResponse.<Void>builder().message("Bulk import successful").build();
     }
 
     @GetMapping("/{id}")

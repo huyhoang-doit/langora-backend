@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.langora.learning.domain.repository.LanguageRepository;
 import com.langora.shared.exception.AppException;
@@ -35,13 +36,15 @@ public class WritingTopicService {
     LanguageRepository languageRepository;
     WritingTopicMapper writingTopicMapper;
 
-    public Page<WritingTopicResponse> getTopics(String langId, int page, int size) {
+    public Page<WritingTopicResponse> getTopics(String langId, String search, int page, int size) {
         if (!languageRepository.existsById(langId)) {
             throw new AppException(ErrorCode.LANGUAGE_NOT_FOUND);
         }
         Pageable pageable =
                 PageRequest.of(page - 1, size, Sort.by("displayOrder").ascending());
-        Page<WritingTopic> topicPage = writingTopicRepository.findByLanguageId(langId, pageable);
+
+        String searchQuery = (search != null && !search.trim().isEmpty()) ? search.trim() : "";
+        Page<WritingTopic> topicPage = writingTopicRepository.findByLanguageIdAndSearch(langId, searchQuery, pageable);
 
         List<WritingTopicResponse> responses = topicPage.getContent().stream()
                 .map(writingTopicMapper::toResponse)
@@ -68,6 +71,58 @@ public class WritingTopicService {
 
         topic = writingTopicRepository.save(topic);
         return writingTopicMapper.toResponse(topic);
+    }
+
+    @Transactional
+    public void bulkImportTopics(String langId, List<WritingTopicRequest> requests) {
+        if (!languageRepository.existsById(langId)) {
+            throw new AppException(ErrorCode.LANGUAGE_NOT_FOUND);
+        }
+        if (requests == null || requests.isEmpty()) {
+            return;
+        }
+
+        List<String> incomingCodes = requests.stream()
+                .map(WritingTopicRequest::getCode)
+                .filter(code -> code != null && !code.trim().isEmpty())
+                .collect(Collectors.toList());
+
+        List<WritingTopic> existingTopics = incomingCodes.isEmpty() ? java.util.Collections.emptyList() :
+                writingTopicRepository.findAllByLanguageIdAndCodeIn(langId, incomingCodes);
+        java.util.Set<String> existingCodes = existingTopics.stream()
+                .map(WritingTopic::getCode)
+                .collect(Collectors.toSet());
+
+        List<WritingTopic> toSave = new java.util.ArrayList<>();
+        java.util.Set<String> processedCodes = new java.util.HashSet<>();
+
+        for (int i = 0; i < requests.size(); i++) {
+            WritingTopicRequest req = requests.get(i);
+            int rowNumber = i + 1; // Used for error reporting
+
+            if (req.getCode() == null || req.getCode().trim().isEmpty()) {
+                throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Mã chủ đề không được để trống.");
+            }
+            if (req.getName() == null || req.getName().trim().isEmpty()) {
+                throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Tên chủ đề không được để trống.");
+            }
+            if (existingCodes.contains(req.getCode())) {
+                throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Mã chủ đề '" + req.getCode() + "' đã tồn tại.");
+            }
+            if (processedCodes.contains(req.getCode())) {
+                throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Mã chủ đề '" + req.getCode() + "' bị trùng lặp trong file.");
+            }
+
+            WritingTopic topic = writingTopicMapper.toEntity(req);
+            topic.setLanguageId(langId);
+            topic.setCreatedAt(OffsetDateTime.now());
+            topic.setUpdatedAt(OffsetDateTime.now());
+            
+            toSave.add(topic);
+            processedCodes.add(req.getCode());
+        }
+
+        writingTopicRepository.saveAll(toSave);
     }
 
     public WritingTopicResponse updateTopic(String id, WritingTopicRequest request) {
