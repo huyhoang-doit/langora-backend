@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.langora.learning.domain.repository.LanguageRepository;
@@ -38,7 +39,8 @@ public class WritingTopicService {
         if (!languageRepository.existsById(langId)) {
             throw new AppException(ErrorCode.LANGUAGE_NOT_FOUND);
         }
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Pageable pageable =
+                PageRequest.of(page - 1, size, Sort.by("displayOrder").ascending());
         Page<WritingTopic> topicPage = writingTopicRepository.findByLanguageId(langId, pageable);
 
         List<WritingTopicResponse> responses = topicPage.getContent().stream()

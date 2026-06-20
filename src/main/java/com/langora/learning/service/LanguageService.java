@@ -42,6 +42,12 @@ public class LanguageService {
         return new PageImpl<>(responses, pageable, languagePage.getTotalElements());
     }
 
+    public LanguageResponse getLanguageByCode(String code) {
+        Language language =
+                languageRepository.findByCode(code).orElseThrow(() -> new AppException(ErrorCode.LANGUAGE_NOT_FOUND));
+        return languageMapper.toResponse(language);
+    }
+
     public LanguageResponse toggleLanguageStatus(String id) {
         Language language =
                 languageRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.LANGUAGE_NOT_FOUND));

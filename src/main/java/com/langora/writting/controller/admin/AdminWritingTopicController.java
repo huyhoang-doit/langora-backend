@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @RestController
-@RequestMapping(ApiEndpoint.Admin.Languages.WRITING_TOPICS)
+@RequestMapping(ApiEndpoint.Admin.Languages.BASE + ApiEndpoint.Admin.Languages.WRITING_TOPICS)
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AdminWritingTopicController {

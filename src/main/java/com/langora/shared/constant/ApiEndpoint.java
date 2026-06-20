@@ -42,6 +42,7 @@ public final class ApiEndpoint {
         public static final class Languages {
             public static final String BASE = Admin.BASE + "/languages";
             public static final String ID = "/{id}";
+            public static final String CODE = "/{code}";
             public static final String STATUS = "/{id}/status";
             public static final String LEVELS = "/{langId}/levels";
             public static final String WRITING_CONTENT_TYPES = "/{langId}/writing-content-types";

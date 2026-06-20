@@ -28,6 +28,8 @@ public class WritingTopic {
 
     String description;
 
+    Integer displayOrder;
+
     java.time.OffsetDateTime createdAt;
 
     java.time.OffsetDateTime updatedAt;

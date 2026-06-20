@@ -53,6 +53,12 @@ public class AdminLanguageController {
                 .build();
     }
 
+    @GetMapping(ApiEndpoint.Admin.Languages.CODE)
+    public ApiResponse<LanguageResponse> getLanguageByCode(@PathVariable String code) {
+        LanguageResponse result = languageService.getLanguageByCode(code);
+        return ApiResponse.<LanguageResponse>builder().data(result).build();
+    }
+
     @PatchMapping(ApiEndpoint.Admin.Languages.STATUS)
     public ApiResponse<LanguageResponse> toggleStatus(@PathVariable String id) {
         LanguageResponse result = languageService.toggleLanguageStatus(id);

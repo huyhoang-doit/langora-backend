@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @RestController
-@RequestMapping(ApiEndpoint.Admin.Languages.WRITING_CONTENT_TYPES)
+@RequestMapping(ApiEndpoint.Admin.Languages.BASE + ApiEndpoint.Admin.Languages.WRITING_CONTENT_TYPES)
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AdminWritingContentTypeController {

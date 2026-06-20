@@ -20,6 +20,7 @@ public class WritingTopicResponse {
     String code;
     String name;
     String description;
+    Integer displayOrder;
     OffsetDateTime createdAt;
     OffsetDateTime updatedAt;
 }

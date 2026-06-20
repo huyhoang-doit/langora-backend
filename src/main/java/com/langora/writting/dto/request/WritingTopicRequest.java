@@ -23,4 +23,6 @@ public class WritingTopicRequest {
     String name;
 
     String description;
+
+    Integer displayOrder;
 }
