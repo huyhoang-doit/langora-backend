@@ -35,13 +35,15 @@ public class WritingContentTypeService {
     LanguageRepository languageRepository;
     WritingContentTypeMapper writingContentTypeMapper;
 
-    public Page<WritingContentTypeResponse> getContentTypes(String langId, int page, int size) {
+    public Page<WritingContentTypeResponse> getContentTypes(String langId, String search, int page, int size) {
         if (!languageRepository.existsById(langId)) {
             throw new AppException(ErrorCode.LANGUAGE_NOT_FOUND);
         }
         Pageable pageable =
                 PageRequest.of(page - 1, size, Sort.by("displayOrder").ascending());
-        Page<WritingContentType> typePage = writingContentTypeRepository.findByLanguageId(langId, pageable);
+
+        String searchQuery = (search != null && !search.trim().isEmpty()) ? search.trim() : "";
+        Page<WritingContentType> typePage = writingContentTypeRepository.findByLanguageIdAndSearch(langId, searchQuery, pageable);
 
         List<WritingContentTypeResponse> responses = typePage.getContent().stream()
                 .map(writingContentTypeMapper::toResponse)
@@ -68,6 +70,51 @@ public class WritingContentTypeService {
 
         type = writingContentTypeRepository.save(type);
         return writingContentTypeMapper.toResponse(type);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void bulkImportContentTypes(String langId, List<WritingContentTypeRequest> requests) {
+        if (!languageRepository.existsById(langId)) {
+            throw new AppException(ErrorCode.LANGUAGE_NOT_FOUND);
+        }
+        if (requests == null || requests.isEmpty()) {
+            return;
+        }
+
+        java.util.Set<com.langora.writting.domain.enums.WritingContentTypeCode> processedCodes = new java.util.HashSet<>();
+
+        for (int i = 0; i < requests.size(); i++) {
+            WritingContentTypeRequest req = requests.get(i);
+            int rowNumber = i + 1;
+
+            if (req.getCode() == null) {
+                throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Mã loại nội dung không được để trống.");
+            }
+            if (req.getName() == null || req.getName().trim().isEmpty()) {
+                throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Tên loại nội dung không được để trống.");
+            }
+            if (req.getDisplayOrder() == null) {
+                throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Thứ tự hiển thị không được để trống.");
+            }
+            if (processedCodes.contains(req.getCode())) {
+                throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Mã loại nội dung '" + req.getCode() + "' bị trùng lặp trong file.");
+            }
+            processedCodes.add(req.getCode());
+        }
+
+        // Clean table
+        writingContentTypeRepository.deleteByLanguageId(langId);
+
+        List<WritingContentType> toSave = new java.util.ArrayList<>();
+        for (WritingContentTypeRequest req : requests) {
+            WritingContentType type = writingContentTypeMapper.toEntity(req);
+            type.setLanguageId(langId);
+            type.setCreatedAt(OffsetDateTime.now());
+            type.setUpdatedAt(OffsetDateTime.now());
+            toSave.add(type);
+        }
+
+        writingContentTypeRepository.saveAll(toSave);
     }
 
     public WritingContentTypeResponse updateContentType(String id, WritingContentTypeRequest request) {

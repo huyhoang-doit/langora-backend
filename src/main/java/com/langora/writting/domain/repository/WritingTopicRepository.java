@@ -24,4 +24,6 @@ public interface WritingTopicRepository extends JpaRepository<WritingTopic, Stri
             Pageable pageable);
 
     List<WritingTopic> findAllByLanguageIdAndCodeIn(String languageId, java.util.List<String> codes);
+
+    void deleteByLanguageId(String languageId);
 }

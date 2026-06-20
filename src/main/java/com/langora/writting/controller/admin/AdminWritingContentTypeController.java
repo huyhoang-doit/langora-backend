@@ -35,10 +35,11 @@ public class AdminWritingContentTypeController {
     @GetMapping
     public ApiResponse<java.util.List<WritingContentTypeResponse>> getContentTypes(
             @PathVariable String langId,
+            @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        Page<WritingContentTypeResponse> typePage = writingContentTypeService.getContentTypes(langId, page, size);
+        Page<WritingContentTypeResponse> typePage = writingContentTypeService.getContentTypes(langId, search, page, size);
 
         PageMeta meta = PageMeta.builder()
                 .page(page)
@@ -65,6 +66,13 @@ public class AdminWritingContentTypeController {
             @PathVariable String langId, @RequestBody @Valid WritingContentTypeRequest request) {
         WritingContentTypeResponse result = writingContentTypeService.createContentType(langId, request);
         return ApiResponse.<WritingContentTypeResponse>builder().data(result).build();
+    }
+
+    @PostMapping("/bulk")
+    public ApiResponse<Void> bulkImportContentTypes(
+            @PathVariable String langId, @RequestBody java.util.List<WritingContentTypeRequest> requests) {
+        writingContentTypeService.bulkImportContentTypes(langId, requests);
+        return ApiResponse.<Void>builder().message("Bulk import successful").build();
     }
 
     @PutMapping("/{id}")

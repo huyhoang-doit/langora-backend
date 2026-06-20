@@ -82,18 +82,6 @@ public class WritingTopicService {
             return;
         }
 
-        List<String> incomingCodes = requests.stream()
-                .map(WritingTopicRequest::getCode)
-                .filter(code -> code != null && !code.trim().isEmpty())
-                .collect(Collectors.toList());
-
-        List<WritingTopic> existingTopics = incomingCodes.isEmpty() ? java.util.Collections.emptyList() :
-                writingTopicRepository.findAllByLanguageIdAndCodeIn(langId, incomingCodes);
-        java.util.Set<String> existingCodes = existingTopics.stream()
-                .map(WritingTopic::getCode)
-                .collect(Collectors.toSet());
-
-        List<WritingTopic> toSave = new java.util.ArrayList<>();
         java.util.Set<String> processedCodes = new java.util.HashSet<>();
 
         for (int i = 0; i < requests.size(); i++) {
@@ -106,20 +94,22 @@ public class WritingTopicService {
             if (req.getName() == null || req.getName().trim().isEmpty()) {
                 throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Tên chủ đề không được để trống.");
             }
-            if (existingCodes.contains(req.getCode())) {
-                throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Mã chủ đề '" + req.getCode() + "' đã tồn tại.");
-            }
             if (processedCodes.contains(req.getCode())) {
                 throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Mã chủ đề '" + req.getCode() + "' bị trùng lặp trong file.");
             }
+            processedCodes.add(req.getCode());
+        }
 
+        // Clean table
+        writingTopicRepository.deleteByLanguageId(langId);
+
+        List<WritingTopic> toSave = new java.util.ArrayList<>();
+        for (WritingTopicRequest req : requests) {
             WritingTopic topic = writingTopicMapper.toEntity(req);
             topic.setLanguageId(langId);
             topic.setCreatedAt(OffsetDateTime.now());
             topic.setUpdatedAt(OffsetDateTime.now());
-            
             toSave.add(topic);
-            processedCodes.add(req.getCode());
         }
 
         writingTopicRepository.saveAll(toSave);
