@@ -10,8 +10,10 @@ public enum ErrorCode {
     // -- COMMON --
     UNCATEGORIZED_EXEPTION(9999, "Uncategorized Exception Error", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_KEY(9998, "Invalid Key Error", HttpStatus.BAD_REQUEST),
+    BULK_IMPORT_FAILED(9997, "Bulk import failed", HttpStatus.BAD_REQUEST),
     FILE_UPLOAD_FAILED(9001, "Failed to upload file", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_TOO_LARGE(9002, "File size exceeds the maximum limit (20MB)", HttpStatus.BAD_REQUEST),
+    RESOURCE_NOT_FOUND(1009, "Resource not found", HttpStatus.NOT_FOUND),
 
     // -- IDENTITY & AUTH --
     UNAUTHENTICATED(1006, "Unauthenticated", HttpStatus.UNAUTHORIZED),
@@ -23,6 +25,18 @@ public enum ErrorCode {
     PASSWORD_INVALID(1004, "Password must be at least {min} characters", HttpStatus.BAD_REQUEST),
     USER_NOT_EXISTED(1005, "User not existed", HttpStatus.NOT_FOUND),
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
+
+    // -- LEARNING / LANGUAGE --
+    LANGUAGE_NOT_FOUND(6001, "Language not found", HttpStatus.NOT_FOUND),
+    LEARNING_LEVEL_NOT_FOUND(6002, "Learning level not found", HttpStatus.NOT_FOUND),
+    LEARNING_LEVEL_IN_USE(6003, "Learning level is currently in use by learning paths", HttpStatus.CONFLICT),
+
+    // -- LEARNING / WRITING --
+    WRITING_CONTENT_TYPE_NOT_FOUND(5003, "Writing content type not found", HttpStatus.NOT_FOUND),
+    WRITING_CONTENT_TYPE_IN_USE(5004, "Writing content type is currently in use by exercises", HttpStatus.CONFLICT),
+    WRITING_TOPIC_NOT_FOUND(5005, "Writing topic not found", HttpStatus.NOT_FOUND),
+    WRITING_TOPIC_IN_USE(5006, "Writing topic is currently in use by exercises", HttpStatus.CONFLICT),
+    WRITING_EXERCISE_NOT_FOUND(5007, "Writing exercise not found", HttpStatus.NOT_FOUND),
 
     // -- ROLE --
     ROLE_NOT_FOUND(2001, "Role not found", HttpStatus.NOT_FOUND),

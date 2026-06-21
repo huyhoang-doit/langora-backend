@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.langora.shared.dto.response.ApiResponse;
 
@@ -35,7 +36,12 @@ public class GlobalExeptionHandler {
         ErrorCode errorCode = exception.getErrorCode();
 
         apiResponse.setSuccess(false);
-        apiResponse.setMessage(errorCode.getMsg());
+        if (exception.getCustomMessage() != null
+                && !exception.getCustomMessage().isEmpty()) {
+            apiResponse.setMessage(exception.getCustomMessage());
+        } else {
+            apiResponse.setMessage(errorCode.getMsg());
+        }
         return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
     }
 
@@ -80,6 +86,17 @@ public class GlobalExeptionHandler {
                 .body(ApiResponse.builder()
                         .success(false)
                         .message(errorCode.getMsg())
+                        .build());
+    }
+
+    @ExceptionHandler(value = NoResourceFoundException.class)
+    ResponseEntity<ApiResponse> noResourceFoundExceptionHandler(NoResourceFoundException exception) {
+        ErrorCode errorCode = ErrorCode.RESOURCE_NOT_FOUND;
+
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(ApiResponse.builder()
+                        .success(false)
+                        .message(errorCode.getMsg() + ": " + exception.getResourcePath())
                         .build());
     }
 

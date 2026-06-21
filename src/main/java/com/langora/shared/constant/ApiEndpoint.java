@@ -38,5 +38,37 @@ public final class ApiEndpoint {
             public static final String ID = "/{userId}";
             public static final String PROGRESS = "/{userId}/progress";
         }
+
+        public static final class Languages {
+            public static final String BASE = Admin.BASE + "/languages";
+            public static final String ID = "/{id}";
+            public static final String CODE = "/{code}";
+            public static final String STATUS = "/{id}/status";
+            public static final String LEVELS = "/{langId}/levels";
+            public static final String WRITING_CONTENT_TYPES = "/{langId}/writing-content-types";
+            public static final String WRITING_TOPICS = "/{langId}/writing-topics";
+        }
+
+        public static final class Levels {
+            public static final String BASE = Admin.BASE + "/levels";
+            public static final String ID = "/{id}";
+        }
+
+        public static final class WritingContentTypes {
+            public static final String BASE = Admin.BASE + "/writing-content-types";
+            public static final String ID = "/{id}";
+        }
+
+        public static final class WritingTopics {
+            public static final String BASE = Admin.BASE + "/writing-topics";
+            public static final String ID = "/{id}";
+        }
+
+        public static final class WritingExercises {
+            public static final String BASE = Admin.BASE + "/writing-exercises";
+            public static final String ID = "/{id}";
+            public static final String STATUS = "/{id}/status";
+            public static final String IMPORT = "/language/{languageId}/import";
+        }
     }
 }
