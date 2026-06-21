@@ -14,24 +14,25 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class WritingExerciseResponse {
+public class WritingExerciseSentenceResponse {
+
     String id;
-    String languageId;
-    String levelId;
-    String levelName;
-    String contentTypeId;
-    String contentTypeName;
-    String topicId;
-    String topicName;
-    String title;
-    String summary;
-    String content;
-    String thumbnailUrl;
-    Integer totalSentences;
-    Integer estimatedMinutes;
-    Integer creditsReward;
-    Integer xpReward;
-    Boolean isActive;
+
+    String exerciseId;
+
+    Integer sentenceOrder;
+
+    String sourceText;
+
+    String targetText;
+
+    java.util.List<String> vocabularyHints;
+
+    java.util.List<String> grammarHints;
+
+    java.math.BigDecimal difficultyScore;
+
     OffsetDateTime createdAt;
+
     OffsetDateTime updatedAt;
 }

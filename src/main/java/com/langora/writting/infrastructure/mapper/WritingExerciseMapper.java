@@ -17,6 +17,7 @@ public interface WritingExerciseMapper {
     @Mapping(target = "levelName", ignore = true)
     @Mapping(target = "contentTypeName", ignore = true)
     @Mapping(target = "topicName", ignore = true)
+    @Mapping(target = "content", source = "content")
     WritingExerciseResponse toResponse(WritingExercises entity);
 
     void updateEntityFromRequest(WritingExerciseRequest request, @MappingTarget WritingExercises entity);
