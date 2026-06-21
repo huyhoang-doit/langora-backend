@@ -30,7 +30,11 @@ public class WritingExercises {
 
     String title;
 
+    @Column(columnDefinition = "TEXT")
     String summary;
+
+    @Column(columnDefinition = "TEXT")
+    String content;
 
     String thumbnailUrl;
 

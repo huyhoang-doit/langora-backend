@@ -144,6 +144,7 @@
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/vocabulary/domain/enums/VocabularyStatus.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/controller/admin/AdminWritingContentTypeController.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/controller/admin/AdminWritingExerciseController.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/controller/admin/AdminWritingExerciseSentenceController.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/controller/admin/AdminWritingTopicController.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/domain/entity/WritingAchievement.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/domain/entity/WritingAiFeedback.java
@@ -164,14 +165,18 @@
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/domain/repository/WritingTopicRepository.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/dto/request/WritingContentTypeRequest.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/dto/request/WritingExerciseRequest.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/dto/request/WritingExerciseSentenceRequest.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/dto/request/WritingExerciseStatusUpdateRequest.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/dto/request/WritingTopicRequest.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/dto/response/WritingContentTypeResponse.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/dto/response/WritingExerciseResponse.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/dto/response/WritingExerciseSentenceResponse.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/dto/response/WritingTopicResponse.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/infrastructure/mapper/WritingContentTypeMapper.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/infrastructure/mapper/WritingExerciseMapper.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/infrastructure/mapper/WritingExerciseSentenceMapper.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/infrastructure/mapper/WritingTopicMapper.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/service/WritingContentTypeService.java
+/Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/service/WritingExerciseSentenceService.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/service/WritingExerciseService.java
 /Volumes/KingSton 1TB/Web/Langora/langora-backend/src/main/java/com/langora/writting/service/WritingTopicService.java

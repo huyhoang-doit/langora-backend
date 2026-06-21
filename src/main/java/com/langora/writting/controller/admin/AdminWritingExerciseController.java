@@ -1,5 +1,7 @@
 package com.langora.writting.controller.admin;
 
+import java.util.List;
+
 import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Page;
@@ -18,8 +20,11 @@ import com.langora.shared.constant.ApiEndpoint;
 import com.langora.shared.dto.response.ApiResponse;
 import com.langora.shared.dto.response.PageMeta;
 import com.langora.writting.dto.request.WritingExerciseRequest;
+import com.langora.writting.dto.request.WritingExerciseSentenceRequest;
 import com.langora.writting.dto.request.WritingExerciseStatusUpdateRequest;
 import com.langora.writting.dto.response.WritingExerciseResponse;
+import com.langora.writting.dto.response.WritingExerciseSentenceResponse;
+import com.langora.writting.service.WritingExerciseSentenceService;
 import com.langora.writting.service.WritingExerciseService;
 
 import lombok.AccessLevel;
@@ -33,9 +38,10 @@ import lombok.experimental.FieldDefaults;
 public class AdminWritingExerciseController {
 
     WritingExerciseService writingExerciseService;
+    WritingExerciseSentenceService writingExerciseSentenceService;
 
     @GetMapping
-    public ApiResponse<java.util.List<WritingExerciseResponse>> getExercises(
+    public ApiResponse<List<WritingExerciseResponse>> getExercises(
             @RequestParam String languageId,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String levelId,
@@ -54,7 +60,7 @@ public class AdminWritingExerciseController {
                 .totalPages(exercisePage.getTotalPages())
                 .build();
 
-        return ApiResponse.<java.util.List<WritingExerciseResponse>>builder()
+        return ApiResponse.<List<WritingExerciseResponse>>builder()
                 .data(exercisePage.getContent())
                 .meta(meta)
                 .build();
@@ -86,6 +92,13 @@ public class AdminWritingExerciseController {
         return ApiResponse.<WritingExerciseResponse>builder().data(result).build();
     }
 
+    @PatchMapping(ApiEndpoint.Admin.WritingExercises.CONTENT)
+    public ApiResponse<WritingExerciseResponse> updateContent(
+            @PathVariable String id, @RequestBody @Valid com.langora.writting.dto.request.WritingExerciseContentRequest request) {
+        WritingExerciseResponse result = writingExerciseService.updateContent(id, request);
+        return ApiResponse.<WritingExerciseResponse>builder().data(result).build();
+    }
+
     @DeleteMapping(ApiEndpoint.Admin.WritingExercises.ID)
     public ApiResponse<Void> deleteExercise(@PathVariable String id) {
         writingExerciseService.deleteExercise(id);
@@ -94,9 +107,37 @@ public class AdminWritingExerciseController {
 
     @PostMapping(ApiEndpoint.Admin.WritingExercises.IMPORT)
     public ApiResponse<Void> bulkImportExercises(
-            @PathVariable("languageId") String languageId,
-            @RequestBody java.util.List<WritingExerciseRequest> requests) {
+            @PathVariable("languageId") String languageId, @RequestBody List<WritingExerciseRequest> requests) {
         writingExerciseService.bulkImportExercises(languageId, requests);
         return ApiResponse.<Void>builder().message("Bulk import successful").build();
+    }
+
+    @GetMapping(ApiEndpoint.Admin.WritingExercises.SENTENCES)
+    public ApiResponse<List<WritingExerciseSentenceResponse>> getSentencesByExerciseId(
+            @PathVariable("exerciseId") String exerciseId,
+            @RequestParam(required = false) String search) {
+        List<WritingExerciseSentenceResponse> responses =
+                writingExerciseSentenceService.getSentencesByExerciseId(exerciseId, search);
+        return ApiResponse.<List<WritingExerciseSentenceResponse>>builder()
+                .data(responses)
+                .build();
+    }
+
+    @PostMapping(ApiEndpoint.Admin.WritingExercises.SENTENCES)
+    public ApiResponse<WritingExerciseSentenceResponse> createSentence(
+            @PathVariable("exerciseId") String exerciseId, @RequestBody @Valid WritingExerciseSentenceRequest request) {
+        WritingExerciseSentenceResponse result = writingExerciseSentenceService.createSentence(exerciseId, request);
+        return ApiResponse.<WritingExerciseSentenceResponse>builder()
+                .data(result)
+                .build();
+    }
+
+    @PostMapping(ApiEndpoint.Admin.WritingExercises.IMPORT_SENTENCES)
+    public ApiResponse<Void> bulkImportSentences(
+            @PathVariable("exerciseId") String exerciseId, @RequestBody List<WritingExerciseSentenceRequest> requests) {
+        writingExerciseSentenceService.bulkImportSentences(exerciseId, requests);
+        return ApiResponse.<Void>builder()
+                .message("Bulk import sentences successful")
+                .build();
     }
 }

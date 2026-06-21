@@ -34,6 +34,8 @@ public class WritingExerciseRequest {
 
     String summary;
 
+    String content;
+
     String thumbnailUrl;
 
     Integer estimatedMinutes;

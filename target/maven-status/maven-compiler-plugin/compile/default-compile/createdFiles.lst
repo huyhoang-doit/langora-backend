@@ -47,6 +47,7 @@ com/langora/learning/dto/request/LevelRequest.class
 com/langora/identity/domain/entity/LoginHistory$LoginHistoryBuilder.class
 com/langora/learning/controller/admin/AdminLanguageController.class
 com/langora/user/infrastructure/mapper/UserActivityMapper.class
+com/langora/writting/infrastructure/mapper/WritingExerciseSentenceMapperImpl.class
 com/langora/shared/constant/ApiEndpoint.class
 com/langora/identity/dto/request/RoleCreationRequest$RoleCreationRequestBuilder.class
 com/langora/writting/dto/request/WritingExerciseStatusUpdateRequest.class
@@ -71,6 +72,7 @@ com/langora/learning/domain/entity/LessonResource.class
 com/langora/writting/domain/entity/WritingTopic$WritingTopicBuilder.class
 com/langora/writting/infrastructure/mapper/WritingTopicMapper.class
 com/langora/vocabulary/domain/enums/PronunciationType.class
+com/langora/writting/dto/response/WritingExerciseSentenceResponse.class
 com/langora/writting/domain/entity/WritingExerciseSentence.class
 com/langora/identity/domain/enums/AuditAction.class
 com/langora/shared/validator/DobValidator.class
@@ -129,6 +131,7 @@ com/langora/vocabulary/domain/entity/VocabularyExample$VocabularyExampleBuilder.
 com/langora/shared/constant/ApiEndpoint$Admin$WritingContentTypes.class
 com/langora/vocabulary/domain/entity/VocabularyPronunciation.class
 com/langora/writting/service/WritingTopicService.class
+com/langora/writting/infrastructure/mapper/WritingExerciseSentenceMapper$1.class
 com/langora/learning/domain/entity/UserUnitProgress.class
 com/langora/writting/dto/request/WritingTopicRequest$WritingTopicRequestBuilder.class
 com/langora/user/dto/request/UserProfileUpdateRequest$UserProfileUpdateRequestBuilder.class
@@ -139,6 +142,7 @@ com/langora/billing/domain/entity/WalletTransaction.class
 com/langora/vocabulary/domain/entity/VocabularySynonym.class
 com/langora/identity/domain/entity/PasswordReset.class
 com/langora/learning/domain/entity/LessonPrerequisite.class
+com/langora/writting/dto/response/WritingExerciseSentenceResponse$WritingExerciseSentenceResponseBuilder.class
 com/langora/shared/dto/response/FileUrlResponse$FileUrlResponseBuilder.class
 com/langora/learning/dto/response/LanguageResponse$LanguageResponseBuilder.class
 com/langora/learning/infrastructure/mapper/LevelMapperImpl.class
@@ -148,6 +152,7 @@ com/langora/writting/infrastructure/mapper/WritingTopicMapperImpl.class
 com/langora/user/domain/entity/UserLearningProfile.class
 com/langora/vocabulary/domain/entity/VocabularyTagMapping$VocabularyTagMappingBuilder.class
 com/langora/learning/domain/entity/UserLearningPathProgress$UserLearningPathProgressBuilder.class
+com/langora/writting/dto/request/WritingExerciseSentenceRequest$WritingExerciseSentenceRequestBuilder.class
 com/langora/writting/dto/response/WritingContentTypeResponse.class
 com/langora/shared/constant/ApiEndpoint$Admin$UserProfiles.class
 com/langora/user/domain/enums/ProficiencyLevel.class
@@ -259,19 +264,24 @@ com/langora/learning/dto/response/LevelResponse$LevelResponseBuilder.class
 com/langora/writting/dto/request/WritingExerciseRequest$WritingExerciseRequestBuilder.class
 com/langora/billing/domain/entity/PaymentWebhookLog.class
 com/langora/user/domain/entity/UserLanguageProgress.class
+com/langora/writting/service/WritingExerciseSentenceService.class
+com/langora/shared/constant/ApiEndpoint$Admin$WritingExerciseSentences.class
 com/langora/learning/dto/request/LevelRequest$LevelRequestBuilder.class
 com/langora/user/domain/entity/UserLearningProfile$UserLearningProfileBuilder.class
 com/langora/writting/domain/entity/WritingExercises$WritingExercisesBuilder.class
 com/langora/shared/dto/response/ApiError.class
 com/langora/user/service/UserActivityService.class
 com/langora/identity/domain/entity/EmailVerification.class
+com/langora/writting/controller/admin/AdminWritingExerciseSentenceController.class
 com/langora/shared/service/impl/CloudinaryStorageServiceImpl.class
 com/langora/identity/domain/entity/UserRole$UserRoleBuilder.class
+com/langora/writting/infrastructure/mapper/WritingExerciseSentenceMapper.class
 com/langora/writting/service/WritingContentTypeService.class
 com/langora/identity/dto/response/PermissionResponse$PermissionResponseBuilder.class
 com/langora/user/domain/entity/UserLearningGoal$UserLearningGoalBuilder.class
 com/langora/identity/repository/RolePermissionRepository.class
 com/langora/learning/domain/enums/LessonType.class
+com/langora/writting/dto/request/WritingExerciseSentenceRequest.class
 com/langora/learning/service/LanguageService.class
 com/langora/billing/domain/entity/Payment.class
 com/langora/shared/constant/ApiEndpoint$Admin$Permissions.class
