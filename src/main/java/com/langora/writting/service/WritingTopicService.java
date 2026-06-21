@@ -89,13 +89,17 @@ public class WritingTopicService {
             int rowNumber = i + 1; // Used for error reporting
 
             if (req.getCode() == null || req.getCode().trim().isEmpty()) {
-                throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Mã chủ đề không được để trống.");
+                throw new AppException(
+                        ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Mã chủ đề không được để trống.");
             }
             if (req.getName() == null || req.getName().trim().isEmpty()) {
-                throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Tên chủ đề không được để trống.");
+                throw new AppException(
+                        ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Tên chủ đề không được để trống.");
             }
             if (processedCodes.contains(req.getCode())) {
-                throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Mã chủ đề '" + req.getCode() + "' bị trùng lặp trong file.");
+                throw new AppException(
+                        ErrorCode.BULK_IMPORT_FAILED,
+                        "Lỗi dòng " + rowNumber + ": Mã chủ đề '" + req.getCode() + "' bị trùng lặp trong file.");
             }
             processedCodes.add(req.getCode());
         }

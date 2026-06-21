@@ -68,10 +68,11 @@ public class AdminLanguageController {
     @GetMapping(ApiEndpoint.Admin.Languages.LEVELS)
     public ApiResponse<java.util.List<LevelResponse>> getLevelsByLanguage(
             @PathVariable String langId,
+            @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        Page<LevelResponse> levelPage = levelService.getLevelsByLanguage(langId, page, size);
+        Page<LevelResponse> levelPage = levelService.getLevelsByLanguage(langId, search, page, size);
 
         PageMeta meta = PageMeta.builder()
                 .page(page)
@@ -91,5 +92,12 @@ public class AdminLanguageController {
             @PathVariable String langId, @RequestBody @Valid LevelRequest request) {
         LevelResponse result = levelService.createLevel(langId, request);
         return ApiResponse.<LevelResponse>builder().data(result).build();
+    }
+
+    @PostMapping(ApiEndpoint.Admin.Languages.LEVELS + "/bulk")
+    public ApiResponse<Void> bulkImportLevels(
+            @PathVariable("langId") String langId, @RequestBody java.util.List<LevelRequest> requests) {
+        levelService.bulkImportLevels(langId, requests);
+        return ApiResponse.<Void>builder().message("Bulk import successful").build();
     }
 }

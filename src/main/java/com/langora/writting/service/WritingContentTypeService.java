@@ -43,7 +43,8 @@ public class WritingContentTypeService {
                 PageRequest.of(page - 1, size, Sort.by("displayOrder").ascending());
 
         String searchQuery = (search != null && !search.trim().isEmpty()) ? search.trim() : "";
-        Page<WritingContentType> typePage = writingContentTypeRepository.findByLanguageIdAndSearch(langId, searchQuery, pageable);
+        Page<WritingContentType> typePage =
+                writingContentTypeRepository.findByLanguageIdAndSearch(langId, searchQuery, pageable);
 
         List<WritingContentTypeResponse> responses = typePage.getContent().stream()
                 .map(writingContentTypeMapper::toResponse)
@@ -81,23 +82,33 @@ public class WritingContentTypeService {
             return;
         }
 
-        java.util.Set<com.langora.writting.domain.enums.WritingContentTypeCode> processedCodes = new java.util.HashSet<>();
+        java.util.Set<com.langora.writting.domain.enums.WritingContentTypeCode> processedCodes =
+                new java.util.HashSet<>();
 
         for (int i = 0; i < requests.size(); i++) {
             WritingContentTypeRequest req = requests.get(i);
             int rowNumber = i + 1;
 
             if (req.getCode() == null) {
-                throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Mã loại nội dung không được để trống.");
+                throw new AppException(
+                        ErrorCode.BULK_IMPORT_FAILED,
+                        "Lỗi dòng " + rowNumber + ": Mã loại nội dung không được để trống.");
             }
             if (req.getName() == null || req.getName().trim().isEmpty()) {
-                throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Tên loại nội dung không được để trống.");
+                throw new AppException(
+                        ErrorCode.BULK_IMPORT_FAILED,
+                        "Lỗi dòng " + rowNumber + ": Tên loại nội dung không được để trống.");
             }
             if (req.getDisplayOrder() == null) {
-                throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Thứ tự hiển thị không được để trống.");
+                throw new AppException(
+                        ErrorCode.BULK_IMPORT_FAILED,
+                        "Lỗi dòng " + rowNumber + ": Thứ tự hiển thị không được để trống.");
             }
             if (processedCodes.contains(req.getCode())) {
-                throw new AppException(ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Mã loại nội dung '" + req.getCode() + "' bị trùng lặp trong file.");
+                throw new AppException(
+                        ErrorCode.BULK_IMPORT_FAILED,
+                        "Lỗi dòng " + rowNumber + ": Mã loại nội dung '" + req.getCode()
+                                + "' bị trùng lặp trong file.");
             }
             processedCodes.add(req.getCode());
         }

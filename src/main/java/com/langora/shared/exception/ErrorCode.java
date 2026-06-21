@@ -36,6 +36,7 @@ public enum ErrorCode {
     WRITING_CONTENT_TYPE_IN_USE(5004, "Writing content type is currently in use by exercises", HttpStatus.CONFLICT),
     WRITING_TOPIC_NOT_FOUND(5005, "Writing topic not found", HttpStatus.NOT_FOUND),
     WRITING_TOPIC_IN_USE(5006, "Writing topic is currently in use by exercises", HttpStatus.CONFLICT),
+    WRITING_EXERCISE_NOT_FOUND(5007, "Writing exercise not found", HttpStatus.NOT_FOUND),
 
     // -- ROLE --
     ROLE_NOT_FOUND(2001, "Role not found", HttpStatus.NOT_FOUND),

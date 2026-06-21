@@ -36,7 +36,8 @@ public class GlobalExeptionHandler {
         ErrorCode errorCode = exception.getErrorCode();
 
         apiResponse.setSuccess(false);
-        if (exception.getCustomMessage() != null && !exception.getCustomMessage().isEmpty()) {
+        if (exception.getCustomMessage() != null
+                && !exception.getCustomMessage().isEmpty()) {
             apiResponse.setMessage(exception.getCustomMessage());
         } else {
             apiResponse.setMessage(errorCode.getMsg());

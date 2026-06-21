@@ -63,5 +63,12 @@ public final class ApiEndpoint {
             public static final String BASE = Admin.BASE + "/writing-topics";
             public static final String ID = "/{id}";
         }
+
+        public static final class WritingExercises {
+            public static final String BASE = Admin.BASE + "/writing-exercises";
+            public static final String ID = "/{id}";
+            public static final String STATUS = "/{id}/status";
+            public static final String IMPORT = "/language/{languageId}/import";
+        }
     }
 }

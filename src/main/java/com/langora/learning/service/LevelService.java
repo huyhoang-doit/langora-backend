@@ -33,13 +33,15 @@ public class LevelService {
     LanguageRepository languageRepository;
     LevelMapper levelMapper;
 
-    public Page<LevelResponse> getLevelsByLanguage(String langId, int page, int size) {
+    public Page<LevelResponse> getLevelsByLanguage(String langId, String search, int page, int size) {
         if (!languageRepository.existsById(langId)) {
             throw new AppException(ErrorCode.LANGUAGE_NOT_FOUND);
         }
 
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("orderIndex").ascending());
-        Page<Level> levelPage = levelRepository.findByLanguageId(langId, pageable);
+
+        String searchQuery = (search != null && !search.trim().isEmpty()) ? search.trim() : "";
+        Page<Level> levelPage = levelRepository.findByLanguageIdAndSearch(langId, searchQuery, pageable);
 
         List<LevelResponse> responses =
                 levelPage.getContent().stream().map(levelMapper::toResponse).collect(Collectors.toList());
@@ -70,5 +72,51 @@ public class LevelService {
 
         level = levelRepository.save(level);
         return levelMapper.toResponse(level);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void bulkImportLevels(String langId, List<LevelRequest> requests) {
+        if (!languageRepository.existsById(langId)) {
+            throw new AppException(ErrorCode.LANGUAGE_NOT_FOUND);
+        }
+        if (requests == null || requests.isEmpty()) {
+            return;
+        }
+
+        java.util.Set<String> processedCodes = new java.util.HashSet<>();
+
+        for (int i = 0; i < requests.size(); i++) {
+            LevelRequest req = requests.get(i);
+            int rowNumber = i + 1;
+
+            if (req.getCode() == null || req.getCode().trim().isEmpty()) {
+                throw new AppException(
+                        ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Mã cấp độ không được để trống.");
+            }
+            if (req.getName() == null || req.getName().trim().isEmpty()) {
+                throw new AppException(
+                        ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Tên cấp độ không được để trống.");
+            }
+            if (processedCodes.contains(req.getCode())) {
+                throw new AppException(
+                        ErrorCode.BULK_IMPORT_FAILED,
+                        "Lỗi dòng " + rowNumber + ": Mã cấp độ '" + req.getCode() + "' bị trùng lặp trong file.");
+            }
+            processedCodes.add(req.getCode());
+        }
+
+        // Clean table
+        levelRepository.deleteByLanguageId(langId);
+
+        List<Level> toSave = new java.util.ArrayList<>();
+        for (LevelRequest req : requests) {
+            Level level = levelMapper.toEntity(req);
+            level.setLanguageId(langId);
+            level.setCreatedAt(OffsetDateTime.now());
+            level.setUpdatedAt(OffsetDateTime.now());
+            toSave.add(level);
+        }
+
+        levelRepository.saveAll(toSave);
     }
 }

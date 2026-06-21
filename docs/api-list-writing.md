@@ -46,28 +46,30 @@ Quản lý các chủ đề viết (VD: PERSONAL, BUSINESS, EDUCATION, TRAVEL, T
 ## 4. Writing Exercises (Bài tập luyện viết)
 Entity chính liên kết Ngôn ngữ, Cấp độ, Thể loại và Chủ đề để tạo ra một bài luyện viết hoàn chỉnh.
 
-| Feature | Method | Endpoint | Description |
+| Feature | Method | Endpoint | Description / Payload |
 | :--- | :--- | :--- | :--- |
-| List Exercises| `GET` | `/api/v1/admin/writing-exercises` | Danh sách bài tập (Hỗ trợ filter theo `languageId`, `levelId`, `topicId`, `status`). |
-| Get Exercise | `GET` | `/api/v1/admin/writing-exercises/:id`| Xem chi tiết thông tin bài tập viết (title, summary, thumbnail, phần thưởng xp/credits). |
-| Create Exercise| `POST` | `/api/v1/admin/writing-exercises` | Thêm mới một bài tập viết. |
-| Update Exercise| `PUT` | `/api/v1/admin/writing-exercises/:id`| Chỉnh sửa bài tập viết. |
+| List Exercises | `GET` | `/api/v1/admin/writing-exercises` | **Query:** `languageId` (bắt buộc), `search`, `page`, `size`.<br>Lấy danh sách bài tập. |
+| Get Exercise | `GET` | `/api/v1/admin/writing-exercises/:id`| Xem chi tiết một bài tập. |
+| Create Exercise | `POST` | `/api/v1/admin/writing-exercises` | **Payload:** `languageId`, `levelId`, `contentTypeId`, `topicId`, `title`, `summary`, `thumbnailUrl`, `estimatedMinutes`, `creditsReward`, `xpReward`, `isActive`. |
+| Update Exercise | `PUT` | `/api/v1/admin/writing-exercises/:id`| Cập nhật thông tin bài tập (Như Create). |
 | Toggle Status | `PATCH`| `/api/v1/admin/writing-exercises/:id/status`| Cập nhật trạng thái `is_active` (Bật/Tắt hiển thị với người dùng). |
-| Delete Exercise| `DELETE`| `/api/v1/admin/writing-exercises/:id`| Xóa bài tập viết. |
+| Delete Exercise | `DELETE`| `/api/v1/admin/writing-exercises/:id`| Xóa bài tập viết (kéo theo xóa các câu bên trong). |
+| Import Excel | `POST` | `/api/v1/admin/writing-exercises/language/:languageId/import` | **Payload:** Array danh sách bài tập.<br>Xóa dữ liệu cũ theo ngôn ngữ (`deleteByLanguageId`) và Insert Array mới. |
 
 ---
 
 ## 5. Writing Exercise Sentences (Các câu trong bài tập)
 Admin chia đoạn văn/bài viết thành từng câu nhỏ để người dùng luyện dịch và viết lại.
 
-| Feature | Method | Endpoint | Description |
+| Feature | Method | Endpoint | Description / Payload |
 | :--- | :--- | :--- | :--- |
-| List Sentences| `GET` | `/api/v1/admin/writing-exercises/:exerciseId/sentences` | Lấy danh sách tất cả các câu thuộc về một bài tập viết (sắp xếp theo `sentence_order`). |
+| List Sentences | `GET` | `/api/v1/admin/writing-exercises/:exerciseId/sentences` | Lấy danh sách tất cả các câu thuộc về một bài tập viết (sắp xếp theo `sentence_order`). |
 | Get Sentence | `GET` | `/api/v1/admin/writing-exercise-sentences/:id` | Lấy chi tiết một câu. |
-| Create Sentence| `POST` | `/api/v1/admin/writing-exercises/:exerciseId/sentences` | Thêm mới câu dịch (cần có `source_text`, `target_text`, và cấu hình `hints`). |
-| Update Sentence| `PUT` | `/api/v1/admin/writing-exercise-sentences/:id` | Chỉnh sửa chi tiết một câu (Cập nhật ngữ liệu gợi ý grammar_hints, vocabulary_hints). |
-| Sort Sentences| `PATCH`| `/api/v1/admin/writing-exercises/:exerciseId/sentences/reorder` | Cập nhật lại thứ tự các câu (`sentence_order`) trong bài tập. |
-| Delete Sentence| `DELETE`| `/api/v1/admin/writing-exercise-sentences/:id` | Xóa một câu ra khỏi bài tập. |
+| Create Sentence | `POST` | `/api/v1/admin/writing-exercises/:exerciseId/sentences` | **Payload:** `sentenceOrder`, `sourceText`, `targetText`, `vocabularyHints`, `grammarHints`, `difficultyScore`.<br>*(BE tự động cập nhật `total_sentences` của Bài tập).* |
+| Update Sentence | `PUT` | `/api/v1/admin/writing-exercise-sentences/:id` | Chỉnh sửa chi tiết một câu và gợi ý. |
+| Sort Sentences | `PATCH`| `/api/v1/admin/writing-exercises/:exerciseId/sentences/reorder` | Cập nhật lại thứ tự các câu (`sentence_order`) trong bài tập. |
+| Delete Sentence | `DELETE`| `/api/v1/admin/writing-exercise-sentences/:id` | Xóa một câu ra khỏi bài tập. <br>*(BE tự động giảm `total_sentences`).* |
+| Import Excel | `POST` | `/api/v1/admin/writing-exercises/:exerciseId/sentences/import` | **Payload:** Array danh sách câu dịch.<br>Xóa các câu cũ theo Bài tập (`deleteByExerciseId`) và Insert Array mới.<br>*(BE tự động cập nhật `total_sentences`).* |
 
 ---
 

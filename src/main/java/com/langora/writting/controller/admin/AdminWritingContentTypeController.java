@@ -39,7 +39,8 @@ public class AdminWritingContentTypeController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        Page<WritingContentTypeResponse> typePage = writingContentTypeService.getContentTypes(langId, search, page, size);
+        Page<WritingContentTypeResponse> typePage =
+                writingContentTypeService.getContentTypes(langId, search, page, size);
 
         PageMeta meta = PageMeta.builder()
                 .page(page)
