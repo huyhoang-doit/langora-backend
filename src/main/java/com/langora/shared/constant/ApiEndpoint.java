@@ -79,4 +79,56 @@ public final class ApiEndpoint {
             public static final String ID = "/{id}";
         }
     }
+
+    public static final class Client {
+
+        public static final class Auth {
+            public static final String BASE = API_V1 + "/auth";
+            public static final String LOGIN = "/login";
+            public static final String REGISTER = "/register";
+            public static final String REFRESH_TOKEN = "/refresh-token";
+            public static final String LOGOUT = "/logout";
+        }
+
+        public static final class EmailVerifications {
+            public static final String BASE = API_V1 + "/email-verifications";
+        }
+
+        public static final class PasswordResets {
+            public static final String BASE = API_V1 + "/password-resets";
+            public static final String REQUEST = "/request";
+            public static final String RESET = "/reset";
+        }
+
+        public static final class LoginHistories {
+            public static final String BASE = API_V1 + "/login-histories";
+            public static final String ME = "/me";
+        }
+
+        public static final class UserProfiles {
+            public static final String BASE = API_V1 + "/user-profiles";
+            public static final String ME = "/me";
+            public static final String AVATAR = "/me/avatar";
+        }
+
+        public static final class UserPreferences {
+            public static final String BASE = API_V1 + "/user-preferences";
+            public static final String ME = "/me";
+        }
+
+        public static final class UserDevices {
+            public static final String BASE = API_V1 + "/user-devices";
+            public static final String ID = "/{id}";
+        }
+
+        public static final class UserLearningProfiles {
+            public static final String BASE = API_V1 + "/user-learning-profiles";
+            public static final String ME = "/me";
+        }
+
+        public static final class UserLearningGoals {
+            public static final String BASE = API_V1 + "/user-learning-goals";
+            public static final String ME = "/me";
+        }
+    }
 }

@@ -11,6 +11,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.langora.shared.dto.response.ApiResponse;
 import com.langora.shared.exception.ErrorCode;
 
@@ -27,6 +29,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                 ApiResponse.builder().success(false).message(errorCode.getMsg()).build();
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         response.getWriter().write(mapper.writeValueAsString(apiResponse));
         response.flushBuffer();

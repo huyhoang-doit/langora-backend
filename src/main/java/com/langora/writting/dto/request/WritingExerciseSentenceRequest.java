@@ -1,5 +1,8 @@
 package com.langora.writting.dto.request;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -9,9 +12,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
-import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor

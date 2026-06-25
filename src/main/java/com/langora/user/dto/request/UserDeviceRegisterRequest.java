@@ -1,4 +1,4 @@
-package com.langora.writting.dto.request;
+package com.langora.user.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 
@@ -14,8 +14,9 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class WritingExerciseContentRequest {
+public class UserDeviceRegisterRequest {
+    @NotBlank(message = "Device token is required")
+    String deviceToken;
 
-    @NotBlank(message = "Content is required")
-    String content;
+    String deviceType;
 }

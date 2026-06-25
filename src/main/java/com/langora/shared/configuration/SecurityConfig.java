@@ -17,6 +17,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.langora.shared.constant.ApiEndpoint;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -28,8 +30,13 @@ public class SecurityConfig {
         "/auth/introspect",
         "/auth/logout",
         "/auth/refresh",
-        com.langora.shared.constant.ApiEndpoint.Admin.Auth.BASE
-                + com.langora.shared.constant.ApiEndpoint.Admin.Auth.LOGIN
+        ApiEndpoint.Admin.Auth.BASE + ApiEndpoint.Admin.Auth.LOGIN,
+        ApiEndpoint.Client.Auth.BASE + ApiEndpoint.Client.Auth.LOGIN,
+        ApiEndpoint.Client.Auth.BASE + ApiEndpoint.Client.Auth.REGISTER,
+        ApiEndpoint.Client.Auth.BASE + ApiEndpoint.Client.Auth.REFRESH_TOKEN,
+        ApiEndpoint.Client.PasswordResets.BASE + ApiEndpoint.Client.PasswordResets.REQUEST,
+        ApiEndpoint.Client.PasswordResets.BASE + ApiEndpoint.Client.PasswordResets.RESET,
+        ApiEndpoint.Client.EmailVerifications.BASE
     };
 
     private final String[] PUBLIC_GET_ENDPOINTS = {"/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"};

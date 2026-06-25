@@ -148,7 +148,8 @@ public class WritingExerciseService {
         return getExercise(entity.getId());
     }
 
-    public WritingExerciseResponse updateContent(String id, com.langora.writting.dto.request.WritingExerciseContentRequest request) {
+    public WritingExerciseResponse updateContent(
+            String id, com.langora.writting.dto.request.WritingExerciseContentRequest request) {
         WritingExercises entity = writingExercisesRepository
                 .findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.WRITING_EXERCISE_NOT_FOUND));

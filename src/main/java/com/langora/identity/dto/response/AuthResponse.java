@@ -1,6 +1,4 @@
-package com.langora.writting.dto.request;
-
-import jakarta.validation.constraints.NotBlank;
+package com.langora.identity.dto.response;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,8 +12,11 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class WritingExerciseContentRequest {
+public class AuthResponse {
 
-    @NotBlank(message = "Content is required")
-    String content;
+    String accessToken;
+
+    String refreshToken;
+
+    boolean authenticated;
 }

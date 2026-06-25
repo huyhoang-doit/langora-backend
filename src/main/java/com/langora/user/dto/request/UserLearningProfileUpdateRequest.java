@@ -1,6 +1,4 @@
-package com.langora.writting.dto.request;
-
-import jakarta.validation.constraints.NotBlank;
+package com.langora.user.dto.request;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,8 +12,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class WritingExerciseContentRequest {
-
-    @NotBlank(message = "Content is required")
-    String content;
+public class UserLearningProfileUpdateRequest {
+    String bio;
+    String currentLevel;
 }

@@ -1,4 +1,4 @@
-package com.langora.writting.dto.request;
+package com.langora.identity.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 
@@ -14,8 +14,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class WritingExerciseContentRequest {
+public class VerifyEmailRequest {
 
-    @NotBlank(message = "Content is required")
-    String content;
+    @NotBlank(message = "Token is required")
+    String token;
 }

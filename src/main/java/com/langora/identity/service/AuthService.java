@@ -1,6 +1,7 @@
 package com.langora.identity.service;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
@@ -10,14 +11,18 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.langora.identity.domain.entity.Role;
 import com.langora.identity.domain.entity.User;
 import com.langora.identity.domain.entity.UserRole;
 import com.langora.identity.domain.enums.UserStatus;
 import com.langora.identity.dto.request.AdminLoginRequest;
+import com.langora.identity.dto.request.ClientLoginRequest;
+import com.langora.identity.dto.request.ClientRegisterRequest;
 import com.langora.identity.dto.response.AdminAuthResponse;
 import com.langora.identity.dto.response.AdminProfileResponse;
+import com.langora.identity.dto.response.AuthResponse;
 import com.langora.identity.repository.RoleRepository;
 import com.langora.identity.repository.UserRepository;
 import com.langora.identity.repository.UserRoleRepository;
@@ -90,6 +95,75 @@ public class AuthService {
                 .accessToken(token)
                 .authenticated(true)
                 .build();
+    }
+
+    public AuthResponse clientLogin(ClientLoginRequest request) {
+        User user = userRepository
+                .findByEmail(request.getEmail())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
+        String token = generateToken(user);
+
+        return AuthResponse.builder().accessToken(token).authenticated(true).build();
+    }
+
+    @Transactional
+    public AuthResponse clientRegister(ClientRegisterRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
+
+        // Generate next user code logic copied from UserService or simplified
+        String maxCode = userRepository.findMaxUserCode();
+        long nextNum = 1;
+        if (maxCode != null && maxCode.startsWith("US")) {
+            try {
+                nextNum = Long.parseLong(maxCode.substring(2)) + 1;
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        String userCode = String.format("US%07d", nextNum);
+
+        User user = User.builder()
+                .email(request.getEmail())
+                .userCode(userCode)
+                .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .status(UserStatus.ACTIVE) // For now, active by default
+                .emailVerified(false)
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
+                .build();
+
+        user = userRepository.save(user);
+
+        // Assign USER role
+        Role userRole = roleRepository.findByCode("USER").orElse(null);
+        if (userRole != null) {
+            userRoleRepository.save(com.langora.identity.domain.entity.UserRole.builder()
+                    .userId(user.getId())
+                    .roleId(userRole.getId())
+                    .build());
+        }
+
+        // Create profile
+        userProfileRepository.save(com.langora.user.domain.entity.UserProfile.builder()
+                .userId(user.getId())
+                .fullName(request.getFullName())
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
+                .build());
+
+        String token = generateToken(user);
+
+        return AuthResponse.builder().accessToken(token).authenticated(true).build();
     }
 
     public AdminProfileResponse getMe(String userId) {
