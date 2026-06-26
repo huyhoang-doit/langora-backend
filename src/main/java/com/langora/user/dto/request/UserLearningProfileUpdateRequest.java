@@ -1,5 +1,7 @@
 package com.langora.user.dto.request;
 
+import com.langora.user.domain.enums.LearningGoalType;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +15,10 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserLearningProfileUpdateRequest {
-    String bio;
-    String currentLevel;
+    String targetLanguageId;
+    String currentLevelId;
+    LearningGoalType learningGoal;
+    String targetExam;
+    Integer dailyGoalMinutes;
+    Integer dailyGoalWords;
 }

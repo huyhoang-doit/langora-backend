@@ -58,11 +58,12 @@ Giai đoạn 2 tập trung vào module học tập và trải nghiệm luyện v
 
 | Entity Tương Ứng | Endpoint | Method | Mô Tả | Request/Query |
 | :--- | :--- | :--- | :--- | :--- |
-| **WritingTopic** | `/api/v1/writing-topics` | `GET` | Danh sách chủ đề (Categories/Topics) | - |
-| **WritingContentType** | `/api/v1/writing-content-types` | `GET` | Danh sách loại nội dung viết (Essay, Email...) | - |
+| **WritingTopic** | `/api/v1/languages/{langId}/writing-topics` | `GET` | Danh sách chủ đề (Categories/Topics) theo ngôn ngữ | `?levelId=...` |
+| **WritingContentType** | `/api/v1/languages/{langId}/writing-content-types` | `GET` | Danh sách loại nội dung viết (Essay, Email...) theo ngôn ngữ | - |
 | **WritingExercises** | `/api/v1/writing-exercises` | `GET` | Danh sách mẫu bài tập (`WritingExercises`) | `?levelId=...&topicId=...` |
 | **WritingExercises** | `/api/v1/writing-exercises/{id}` | `GET` | Xem chi tiết bài tập (bao gồm đề bài và các câu hỏi) | - |
 | **WritingSession** | `/api/v1/writing-sessions` | `POST` | Bắt đầu phiên thực hành mới (`WritingSession`) cho một bài tập | `WritingSessionCreateRequest` (exerciseId) |
+| **WritingSession** | `/api/v1/writing-sessions/{id}` | `GET` | Lấy chi tiết thông tin của một phiên thực hành (gồm cả bài tập và câu trả lời hiện tại) | - |
 | **WritingSession** | `/api/v1/writing-sessions/{id}` | `PUT` | Cập nhật/Auto-save toàn bộ phiên viết nháp | `WritingSessionUpdateRequest` (content) |
 | **WritingSession** | `/api/v1/writing-sessions/{id}/submit`| `POST` | Nộp toàn bộ bài viết để chấm điểm/review | - |
 | **WritingSentenceAnswer**| `/api/v1/writing-sessions/{id}/sentence-answers`| `POST`/`PUT`| Gửi câu trả lời cho từng câu (`WritingExerciseSentence`) | `WritingSentenceAnswerRequest` |

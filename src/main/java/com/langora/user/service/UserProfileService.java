@@ -1,18 +1,19 @@
 package com.langora.user.service;
 
+import java.time.OffsetDateTime;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.langora.shared.exception.AppException;
 import com.langora.shared.exception.ErrorCode;
+import com.langora.shared.service.FileStorageService;
 import com.langora.user.domain.entity.UserProfile;
 import com.langora.user.dto.request.UserProfileUpdateRequest;
 import com.langora.user.dto.response.UserProfileResponse;
 import com.langora.user.infrastructure.mapper.UserProfileMapper;
 import com.langora.user.repository.UserProfileRepository;
-import com.langora.shared.service.FileStorageService;
-import org.springframework.web.multipart.MultipartFile;
-import java.time.OffsetDateTime;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,8 @@ public class UserProfileService {
     public UserProfileResponse getProfile(String userId) {
         UserProfile userProfile = userProfileRepository
                 .findByUserId(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)); // Or a different code if profile doesn't exist
+                .orElseThrow(() ->
+                        new AppException(ErrorCode.USER_NOT_EXISTED)); // Or a different code if profile doesn't exist
         return userProfileMapper.toResponse(userProfile);
     }
 

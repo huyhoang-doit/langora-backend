@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.langora.shared.constant.ApiEndpoint;
 import com.langora.shared.dto.response.ApiResponse;
+import com.langora.shared.utils.SecurityUtils;
 import com.langora.user.dto.request.UserPreferenceUpdateRequest;
+import com.langora.user.dto.response.UserPreferenceResponse;
+import com.langora.user.service.UserPreferenceService;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -22,15 +25,26 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserPreferenceController {
 
+    UserPreferenceService userPreferenceService;
+
     @GetMapping(ApiEndpoint.Client.UserPreferences.ME)
-    public ApiResponse<Object> getMyPreferences() {
-        // Placeholder for get preferences logic
-        return ApiResponse.builder().message("Fetched preferences successfully").build();
+    public ApiResponse<UserPreferenceResponse> getMyPreferences() {
+        String userId = SecurityUtils.getCurrentUserId();
+        UserPreferenceResponse response = userPreferenceService.getPreference(userId);
+        return ApiResponse.<UserPreferenceResponse>builder()
+                .data(response)
+                .message("Fetched preference successfully")
+                .build();
     }
 
     @PutMapping(ApiEndpoint.Client.UserPreferences.ME)
-    public ApiResponse<Object> updateMyPreferences(@RequestBody @Valid UserPreferenceUpdateRequest request) {
-        // Placeholder for update preferences logic
-        return ApiResponse.builder().message("Updated preferences successfully").build();
+    public ApiResponse<UserPreferenceResponse> updateMyPreferences(
+            @RequestBody @Valid UserPreferenceUpdateRequest request) {
+        String userId = SecurityUtils.getCurrentUserId();
+        UserPreferenceResponse response = userPreferenceService.updatePreference(userId, request);
+        return ApiResponse.<UserPreferenceResponse>builder()
+                .data(response)
+                .message("Updated preference successfully")
+                .build();
     }
 }

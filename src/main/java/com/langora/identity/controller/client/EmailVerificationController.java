@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.langora.identity.dto.request.VerifyEmailRequest;
+import com.langora.identity.service.EmailVerificationService;
 import com.langora.shared.constant.ApiEndpoint;
 import com.langora.shared.dto.response.ApiResponse;
 
@@ -21,9 +22,11 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EmailVerificationController {
 
-    @PostMapping
+    EmailVerificationService emailVerificationService;
+
+    @PostMapping(ApiEndpoint.Client.EmailVerifications.BASE)
     public ApiResponse<Void> verifyEmail(@RequestBody @Valid VerifyEmailRequest request) {
-        // Placeholder for verify email logic
+        emailVerificationService.verifyEmail(request.getToken());
         return ApiResponse.<Void>builder()
                 .message("Email verified successfully")
                 .build();

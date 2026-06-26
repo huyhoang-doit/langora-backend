@@ -47,15 +47,16 @@ public class ClientAuthController {
 
     @PostMapping(ApiEndpoint.Client.Auth.REFRESH_TOKEN)
     public ApiResponse<AuthResponse> refreshToken(@RequestBody @Valid RefreshTokenRequest request) {
-        // Placeholder for refresh token logic
+        AuthResponse result = authService.refreshToken(request.getRefreshToken());
         return ApiResponse.<AuthResponse>builder()
-                .message("Refresh token successfully")
+                .data(result)
+                .message("Token refreshed successfully")
                 .build();
     }
 
     @PostMapping(ApiEndpoint.Client.Auth.LOGOUT)
-    public ApiResponse<Void> logout() {
-        // Placeholder for logout logic
-        return ApiResponse.<Void>builder().message("Logout successfully").build();
+    public ApiResponse<Void> logout(@RequestBody @Valid RefreshTokenRequest request) {
+        authService.logout(request.getRefreshToken());
+        return ApiResponse.<Void>builder().message("Logout successful").build();
     }
 }

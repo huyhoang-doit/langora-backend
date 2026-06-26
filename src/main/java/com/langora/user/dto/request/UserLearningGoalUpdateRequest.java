@@ -1,5 +1,7 @@
 package com.langora.user.dto.request;
 
+import java.time.LocalDate;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +15,11 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserLearningGoalUpdateRequest {
-    String targetLevel;
-    Integer dailyGoalMinutes;
+    String targetLanguageId;
+    String goalTitle;
+    Integer targetWords;
+    Integer targetLessons;
+    Integer targetDays;
+    LocalDate startDate;
+    LocalDate endDate;
 }

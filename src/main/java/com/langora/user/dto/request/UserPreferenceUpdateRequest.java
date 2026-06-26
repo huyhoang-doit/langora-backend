@@ -14,5 +14,9 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserPreferenceUpdateRequest {
     String theme;
-    String language;
+    String languageUi;
+    String timezone;
+    Boolean emailNotificationEnabled;
+    Boolean pushNotificationEnabled;
+    Boolean reminderEnabled;
 }

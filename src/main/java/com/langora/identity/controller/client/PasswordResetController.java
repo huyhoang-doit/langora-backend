@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.langora.identity.dto.request.ForgotPasswordRequest;
 import com.langora.identity.dto.request.ResetPasswordRequest;
+import com.langora.identity.service.PasswordResetService;
 import com.langora.shared.constant.ApiEndpoint;
 import com.langora.shared.dto.response.ApiResponse;
 
@@ -22,19 +23,21 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PasswordResetController {
 
+    PasswordResetService passwordResetService;
+
     @PostMapping(ApiEndpoint.Client.PasswordResets.REQUEST)
     public ApiResponse<Void> requestPasswordReset(@RequestBody @Valid ForgotPasswordRequest request) {
-        // Placeholder for forgot password logic
+        passwordResetService.requestPasswordReset(request.getEmail());
         return ApiResponse.<Void>builder()
-                .message("Password reset link sent to email")
+                .message("Password reset link sent to your email")
                 .build();
     }
 
     @PostMapping(ApiEndpoint.Client.PasswordResets.RESET)
     public ApiResponse<Void> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
-        // Placeholder for reset password logic
+        passwordResetService.resetPassword(request.getToken(), request.getNewPassword());
         return ApiResponse.<Void>builder()
-                .message("Password reset successfully")
+                .message("Password has been reset successfully")
                 .build();
     }
 }

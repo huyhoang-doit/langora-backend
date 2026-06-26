@@ -130,5 +130,31 @@ public final class ApiEndpoint {
             public static final String BASE = API_V1 + "/user-learning-goals";
             public static final String ME = "/me";
         }
+
+        public static final class Languages {
+            public static final String BASE = API_V1 + "/languages";
+            public static final String ID = "/{id}";
+            public static final String LEVELS = "/{langId}/levels";
+            public static final String WRITING_CONTENT_TYPES = "/{langId}/writing-content-types";
+            public static final String WRITING_TOPICS = "/{langId}/writing-topics";
+        }
+
+        public static final class WritingExercises {
+            public static final String BASE = API_V1 + "/writing-exercises";
+            public static final String ID = "/{id}";
+        }
+
+        public static final class WritingSessions {
+            public static final String BASE = API_V1 + "/writing-sessions";
+            public static final String ID = "/{id}";
+            public static final String SUBMIT = "/{id}/submit";
+            public static final String SENTENCE_ANSWERS = "/{id}/sentence-answers";
+            public static final String AI_FEEDBACKS = "/{id}/ai-feedbacks";
+        }
+
+        public static final class WritingAchievements {
+            public static final String BASE = API_V1 + "/writing-achievements";
+            public static final String ME = "/me";
+        }
     }
 }

@@ -2,6 +2,8 @@ package com.langora.user.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 
+import com.langora.user.domain.enums.DeviceType;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,5 +20,8 @@ public class UserDeviceRegisterRequest {
     @NotBlank(message = "Device token is required")
     String deviceToken;
 
-    String deviceType;
+    DeviceType deviceType;
+    String deviceName;
+    String operatingSystem;
+    String appVersion;
 }

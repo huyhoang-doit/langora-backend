@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.langora.shared.constant.ApiEndpoint;
 import com.langora.shared.dto.response.ApiResponse;
+import com.langora.shared.utils.SecurityUtils;
 import com.langora.user.dto.request.UserDeviceRegisterRequest;
+import com.langora.user.dto.response.UserDeviceResponse;
+import com.langora.user.service.UserDeviceService;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -24,17 +27,25 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserDeviceController {
 
+    UserDeviceService userDeviceService;
+
     @GetMapping
-    public ApiResponse<List<Object>> getMyDevices() {
-        // Placeholder for get devices logic
-        return ApiResponse.<List<Object>>builder()
+    public ApiResponse<List<UserDeviceResponse>> getMyDevices() {
+        String userId = SecurityUtils.getCurrentUserId();
+        List<UserDeviceResponse> response = userDeviceService.getDevices(userId);
+        return ApiResponse.<List<UserDeviceResponse>>builder()
+                .data(response)
                 .message("Fetched devices successfully")
                 .build();
     }
 
     @PostMapping
-    public ApiResponse<Object> registerDevice(@RequestBody @Valid UserDeviceRegisterRequest request) {
-        // Placeholder for register device logic
-        return ApiResponse.builder().message("Registered device successfully").build();
+    public ApiResponse<UserDeviceResponse> registerDevice(@RequestBody @Valid UserDeviceRegisterRequest request) {
+        String userId = SecurityUtils.getCurrentUserId();
+        UserDeviceResponse response = userDeviceService.registerDevice(userId, request);
+        return ApiResponse.<UserDeviceResponse>builder()
+                .data(response)
+                .message("Device registered successfully")
+                .build();
     }
 }
