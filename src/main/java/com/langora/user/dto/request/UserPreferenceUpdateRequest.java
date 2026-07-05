@@ -16,6 +16,7 @@ public class UserPreferenceUpdateRequest {
     String theme;
     String languageUi;
     String timezone;
+    String levelId;
     Boolean emailNotificationEnabled;
     Boolean pushNotificationEnabled;
     Boolean reminderEnabled;

@@ -2,6 +2,8 @@ package com.langora.user.dto.response;
 
 import java.time.OffsetDateTime;
 
+import com.langora.learning.dto.response.LevelResponse;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +21,7 @@ public class UserPreferenceResponse {
     String theme;
     String languageUi;
     String timezone;
+    LevelResponse level;
     Boolean emailNotificationEnabled;
     Boolean pushNotificationEnabled;
     Boolean reminderEnabled;

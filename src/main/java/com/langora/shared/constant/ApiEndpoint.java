@@ -140,7 +140,7 @@ public final class ApiEndpoint {
         }
 
         public static final class WritingExercises {
-            public static final String BASE = API_V1 + "/writing-exercises";
+            public static final String BASE = API_V1 + "/languages/{languageId}/writing-exercises";
             public static final String ID = "/{id}";
         }
 

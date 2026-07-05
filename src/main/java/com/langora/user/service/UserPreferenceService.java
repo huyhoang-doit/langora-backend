@@ -5,6 +5,10 @@ import java.time.OffsetDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.langora.learning.domain.repository.LevelRepository;
+import com.langora.learning.infrastructure.mapper.LevelMapper;
+import com.langora.shared.exception.AppException;
+import com.langora.shared.exception.ErrorCode;
 import com.langora.user.domain.entity.UserPreference;
 import com.langora.user.dto.request.UserPreferenceUpdateRequest;
 import com.langora.user.dto.response.UserPreferenceResponse;
@@ -22,12 +26,14 @@ public class UserPreferenceService {
 
     UserPreferenceRepository userPreferenceRepository;
     UserPreferenceMapper userPreferenceMapper;
+    LevelRepository levelRepository;
+    LevelMapper levelMapper;
 
     @Transactional(readOnly = true)
     public UserPreferenceResponse getPreference(String userId) {
         UserPreference preference =
                 userPreferenceRepository.findByUserId(userId).orElseGet(() -> createDefaultPreference(userId));
-        return userPreferenceMapper.toResponse(preference);
+        return buildResponse(preference);
     }
 
     @Transactional
@@ -38,6 +44,11 @@ public class UserPreferenceService {
         if (request.getTheme() != null) preference.setTheme(request.getTheme());
         if (request.getLanguageUi() != null) preference.setLanguageUi(request.getLanguageUi());
         if (request.getTimezone() != null) preference.setTimezone(request.getTimezone());
+        if (request.getLevelId() != null) {
+            levelRepository.findById(request.getLevelId())
+                    .orElseThrow(() -> new AppException(ErrorCode.LEARNING_LEVEL_NOT_FOUND));
+            preference.setLevelId(request.getLevelId());
+        }
         if (request.getEmailNotificationEnabled() != null)
             preference.setEmailNotificationEnabled(request.getEmailNotificationEnabled());
         if (request.getPushNotificationEnabled() != null)
@@ -47,7 +58,17 @@ public class UserPreferenceService {
         preference.setUpdatedAt(OffsetDateTime.now());
         userPreferenceRepository.save(preference);
 
-        return userPreferenceMapper.toResponse(preference);
+        return buildResponse(preference);
+    }
+
+    private UserPreferenceResponse buildResponse(UserPreference preference) {
+        UserPreferenceResponse response = userPreferenceMapper.toResponse(preference);
+        if (preference.getLevelId() != null) {
+            levelRepository.findById(preference.getLevelId()).ifPresent(level -> 
+                response.setLevel(levelMapper.toResponse(level))
+            );
+        }
+        return response;
     }
 
     private UserPreference createDefaultPreference(String userId) {

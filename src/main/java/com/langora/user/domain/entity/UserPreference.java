@@ -28,6 +28,8 @@ public class UserPreference {
 
     String timezone;
 
+    String levelId;
+
     Boolean emailNotificationEnabled;
 
     Boolean pushNotificationEnabled;

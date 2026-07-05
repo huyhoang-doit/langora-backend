@@ -28,7 +28,7 @@ public class ClientWritingExerciseController {
 
     @GetMapping
     public ApiResponse<List<WritingExerciseResponse>> getExercises(
-            @RequestParam(required = false) String languageId,
+            @PathVariable String languageId,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String levelId,
             @RequestParam(required = false) String topicId,
@@ -51,7 +51,9 @@ public class ClientWritingExerciseController {
     }
 
     @GetMapping(ApiEndpoint.Client.WritingExercises.ID)
-    public ApiResponse<WritingExerciseResponse> getExerciseById(@PathVariable String id) {
+    public ApiResponse<WritingExerciseResponse> getExerciseById(
+            @PathVariable String languageId, 
+            @PathVariable String id) {
         WritingExerciseResponse response = writingExerciseService.getExercise(id);
         return ApiResponse.<WritingExerciseResponse>builder()
                 .data(response)
