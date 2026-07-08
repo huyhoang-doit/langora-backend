@@ -16,6 +16,8 @@ public interface WritingExerciseSentenceRepository extends JpaRepository<Writing
 
     void deleteByExerciseIdIn(java.util.List<String> exerciseIds);
 
+    List<WritingExerciseSentence> findByExerciseIdOrderBySentenceOrderAsc(String exerciseId);
+
     @Query("SELECT s FROM WritingExerciseSentence s WHERE s.exerciseId = :exerciseId "
             + "AND (:search IS NULL OR :search = '' OR LOWER(s.sourceText) LIKE LOWER(CONCAT('%', :search, '%')) "
             + "OR LOWER(s.targetText) LIKE LOWER(CONCAT('%', :search, '%'))) "

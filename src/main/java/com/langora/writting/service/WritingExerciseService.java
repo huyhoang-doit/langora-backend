@@ -29,7 +29,10 @@ import com.langora.writting.domain.repository.WritingTopicRepository;
 import com.langora.writting.dto.request.WritingExerciseRequest;
 import com.langora.writting.dto.request.WritingExerciseStatusUpdateRequest;
 import com.langora.writting.dto.response.WritingExerciseResponse;
+import com.langora.writting.dto.response.WritingExerciseSentenceResponse;
+import com.langora.writting.domain.entity.WritingExerciseSentence;
 import com.langora.writting.infrastructure.mapper.WritingExerciseMapper;
+import com.langora.writting.infrastructure.mapper.WritingExerciseSentenceMapper;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +50,7 @@ public class WritingExerciseService {
     WritingContentTypeRepository writingContentTypeRepository;
     WritingTopicRepository writingTopicRepository;
     WritingExerciseMapper writingExerciseMapper;
+    WritingExerciseSentenceMapper writingExerciseSentenceMapper;
 
     public Page<WritingExerciseResponse> getExercises(
             String langId, String search, String levelId, String topicId, String contentTypeId, int page, int size) {
@@ -105,6 +109,12 @@ public class WritingExerciseService {
                 .findById(entity.getContentTypeId())
                 .ifPresent(type -> res.setContentTypeName(type.getName()));
         writingTopicRepository.findById(entity.getTopicId()).ifPresent(topic -> res.setTopicName(topic.getName()));
+
+        List<WritingExerciseSentence> sentences = writingExerciseSentenceRepository.findByExerciseIdOrderBySentenceOrderAsc(id);
+        List<WritingExerciseSentenceResponse> sentenceResponses = sentences.stream()
+                .map(writingExerciseSentenceMapper::toResponse)
+                .collect(Collectors.toList());
+        res.setSentences(sentenceResponses);
 
         return res;
     }

@@ -1,5 +1,7 @@
 package com.langora.writting.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +17,7 @@ import com.langora.writting.domain.enums.WritingSessionStatus;
 import com.langora.writting.domain.repository.WritingAiFeedbackRepository;
 import com.langora.writting.domain.repository.WritingSentenceAnswerRepository;
 import com.langora.writting.domain.repository.WritingSessionRepository;
+import com.langora.writting.dto.request.WritingBulkSentenceAnswerRequest;
 import com.langora.writting.dto.request.WritingSentenceAnswerRequest;
 import com.langora.writting.dto.request.WritingSessionCreateRequest;
 import com.langora.writting.dto.request.WritingSessionStatusUpdateRequest;
@@ -81,6 +84,30 @@ public class WritingSessionService {
                 .findById(sessionId)
                 .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
 
+        List<WritingSentenceAnswer> answers = writingSentenceAnswerRepository.findBySessionId(sessionId);
+        if (!answers.isEmpty()) {
+            BigDecimal totalScore = BigDecimal.ZERO;
+            BigDecimal grammarScore = BigDecimal.ZERO;
+            BigDecimal vocabScore = BigDecimal.ZERO;
+            BigDecimal fluencyScore = BigDecimal.ZERO;
+            BigDecimal accuracyScore = BigDecimal.ZERO;
+
+            for (WritingSentenceAnswer a : answers) {
+                totalScore = totalScore.add(a.getAiScore() != null ? a.getAiScore() : BigDecimal.ZERO);
+                grammarScore = grammarScore.add(a.getGrammarScore() != null ? a.getGrammarScore() : BigDecimal.ZERO);
+                vocabScore = vocabScore.add(a.getVocabularyScore() != null ? a.getVocabularyScore() : BigDecimal.ZERO);
+                fluencyScore = fluencyScore.add(a.getFluencyScore() != null ? a.getFluencyScore() : BigDecimal.ZERO);
+                accuracyScore = accuracyScore.add(a.getAccuracyScore() != null ? a.getAccuracyScore() : BigDecimal.ZERO);
+            }
+
+            BigDecimal count = BigDecimal.valueOf(answers.size());
+            session.setTotalScore(totalScore.divide(count, 2, RoundingMode.HALF_UP));
+            session.setGrammarScore(grammarScore.divide(count, 2, RoundingMode.HALF_UP));
+            session.setVocabularyScore(vocabScore.divide(count, 2, RoundingMode.HALF_UP));
+            session.setFluencyScore(fluencyScore.divide(count, 2, RoundingMode.HALF_UP));
+            session.setAccuracyScore(accuracyScore.divide(count, 2, RoundingMode.HALF_UP));
+        }
+
         session.setStatus(WritingSessionStatus.COMPLETED);
         session.setSubmittedAt(OffsetDateTime.now());
         session.setCompletedAt(OffsetDateTime.now());
@@ -90,17 +117,29 @@ public class WritingSessionService {
         return writingSessionMapper.toResponse(session);
     }
 
-    public void submitSentenceAnswer(String sessionId, WritingSentenceAnswerRequest request) {
+    public WritingAiFeedbackResponse submitSentenceAnswer(String sessionId, WritingSentenceAnswerRequest request) {
+        WritingSession session = writingSessionRepository
+                .findById(sessionId)
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
+
         WritingSentenceAnswer answer = WritingSentenceAnswer.builder()
                 .sessionId(sessionId)
                 .sentenceId(request.getSentenceId())
                 .userAnswer(request.getUserAnswer())
+                .aiScore(BigDecimal.valueOf(8.5))
+                .grammarScore(BigDecimal.valueOf(8.0))
+                .vocabularyScore(BigDecimal.valueOf(9.0))
+                .fluencyScore(BigDecimal.valueOf(8.5))
+                .accuracyScore(BigDecimal.valueOf(9.0))
                 .submittedAt(OffsetDateTime.now())
                 .createdAt(OffsetDateTime.now())
                 .updatedAt(OffsetDateTime.now())
                 .build();
 
-        writingSentenceAnswerRepository.save(answer);
+        answer = writingSentenceAnswerRepository.save(answer);
+
+        session.setCurrentSentenceOrder(session.getCurrentSentenceOrder() + 1);
+        writingSessionRepository.save(session);
 
         // TODO: Real AI Processing Logic should go here.
         // For now, mock a feedback response
@@ -112,7 +151,31 @@ public class WritingSessionService {
                 .fluencyFeedback("Good fluency")
                 .createdAt(OffsetDateTime.now())
                 .build();
-        writingAiFeedbackRepository.save(mockFeedback);
+        mockFeedback = writingAiFeedbackRepository.save(mockFeedback);
+        
+        WritingAiFeedbackResponse response = writingAiFeedbackMapper.toResponse(mockFeedback);
+        response.setSessionId(sessionId);
+        response.setSentenceId(request.getSentenceId());
+        
+        return response;
+    }
+
+    public WritingSessionResponse submitBulkSentenceAnswers(String sessionId, WritingBulkSentenceAnswerRequest request) {
+        WritingSession session = writingSessionRepository
+                .findById(sessionId)
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        if (request.getAnswers() != null) {
+            for (WritingSentenceAnswerRequest answerReq : request.getAnswers()) {
+                submitSentenceAnswer(sessionId, answerReq);
+            }
+        }
+
+        if (request.isSubmitSession()) {
+            return submitSession(sessionId);
+        }
+
+        return writingSessionMapper.toResponse(session);
     }
 
     public List<WritingAiFeedbackResponse> getAiFeedbacks(String sessionId) {

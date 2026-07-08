@@ -16,6 +16,7 @@ import com.langora.shared.constant.ApiEndpoint;
 import com.langora.shared.dto.response.ApiResponse;
 import com.langora.shared.utils.SecurityUtils;
 import com.langora.writting.dto.request.WritingSentenceAnswerRequest;
+import com.langora.writting.dto.request.WritingBulkSentenceAnswerRequest;
 import com.langora.writting.dto.request.WritingSessionCreateRequest;
 import com.langora.writting.dto.request.WritingSessionStatusUpdateRequest;
 import com.langora.writting.dto.response.WritingAiFeedbackResponse;
@@ -73,11 +74,22 @@ public class ClientWritingSessionController {
     }
 
     @PostMapping(ApiEndpoint.Client.WritingSessions.SENTENCE_ANSWERS)
-    public ApiResponse<Void> submitSentenceAnswer(
+    public ApiResponse<WritingAiFeedbackResponse> submitSentenceAnswer(
             @PathVariable String id, @RequestBody @Valid WritingSentenceAnswerRequest request) {
-        writingSessionService.submitSentenceAnswer(id, request);
-        return ApiResponse.<Void>builder()
+        WritingAiFeedbackResponse feedback = writingSessionService.submitSentenceAnswer(id, request);
+        return ApiResponse.<WritingAiFeedbackResponse>builder()
+                .data(feedback)
                 .message("Answer submitted successfully")
+                .build();
+    }
+
+    @PostMapping(ApiEndpoint.Client.WritingSessions.BULK_SENTENCE_ANSWERS)
+    public ApiResponse<WritingSessionResponse> submitBulkSentenceAnswers(
+            @PathVariable String id, @RequestBody @Valid WritingBulkSentenceAnswerRequest request) {
+        WritingSessionResponse response = writingSessionService.submitBulkSentenceAnswers(id, request);
+        return ApiResponse.<WritingSessionResponse>builder()
+                .data(response)
+                .message("Bulk answers submitted successfully")
                 .build();
     }
 

@@ -78,6 +78,24 @@ public final class ApiEndpoint {
             public static final String BASE = Admin.BASE + "/writing-exercise-sentences";
             public static final String ID = "/{id}";
         }
+
+        public static final class Ai {
+            public static final String BASE = Admin.BASE + "/ai";
+
+            public static final class Keys {
+                public static final String BASE = Ai.BASE + "/keys";
+                public static final String ID = "/{id}";
+                public static final String STATUS = "/{id}/status";
+                public static final String BULK = "/bulk";
+            }
+
+            public static final class Prompts {
+                public static final String BASE = Ai.BASE + "/prompts";
+                public static final String ID = "/{id}";
+                public static final String STATUS = "/{id}/status";
+                public static final String BULK = "/bulk";
+            }
+        }
     }
 
     public static final class Client {
@@ -149,6 +167,7 @@ public final class ApiEndpoint {
             public static final String ID = "/{id}";
             public static final String SUBMIT = "/{id}/submit";
             public static final String SENTENCE_ANSWERS = "/{id}/sentence-answers";
+            public static final String BULK_SENTENCE_ANSWERS = "/{id}/bulk-sentence-answers";
             public static final String AI_FEEDBACKS = "/{id}/ai-feedbacks";
         }
 
