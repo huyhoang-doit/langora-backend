@@ -3,10 +3,16 @@ package com.langora.identity.service;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import com.langora.identity.domain.enums.AuthProvider;
+import com.langora.identity.dto.request.GoogleLoginRequest;
+import com.langora.user.domain.entity.UserProfile;
+import com.langora.user.repository.UserProfileRepository;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -56,7 +62,7 @@ public class AuthService {
     UserRoleRepository userRoleRepository;
     RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
-    com.langora.user.repository.UserProfileRepository userProfileRepository;
+    UserProfileRepository userProfileRepository;
     RefreshTokenRepository refreshTokenRepository;
     UserSessionRepository userSessionRepository;
 
@@ -67,6 +73,10 @@ public class AuthService {
     @NonFinal
     @Value("${jwt.valid-duration}")
     protected long VALID_DURATION;
+
+    @NonFinal
+    @Value("${google.client-id}")
+    protected String GOOGLE_CLIENT_ID;
 
     public AdminAuthResponse login(AdminLoginRequest request) {
         User user = userRepository
@@ -158,17 +168,17 @@ public class AuthService {
 
         user = userRepository.save(user);
 
-        // Assign USER role
-        Role userRole = roleRepository.findByCode("USER").orElse(null);
+        // Assign Student role
+        Role userRole = roleRepository.findByCode("STUDENT").orElse(null);
         if (userRole != null) {
-            userRoleRepository.save(com.langora.identity.domain.entity.UserRole.builder()
+            userRoleRepository.save(UserRole.builder()
                     .userId(user.getId())
                     .roleId(userRole.getId())
                     .build());
         }
 
         // Create profile
-        userProfileRepository.save(com.langora.user.domain.entity.UserProfile.builder()
+        userProfileRepository.save(UserProfile.builder()
                 .userId(user.getId())
                 .fullName(request.getFullName())
                 .createdAt(OffsetDateTime.now())
@@ -185,6 +195,118 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional
+    public AuthResponse googleLogin(GoogleLoginRequest request) {
+        try {
+            String token = request.getIdToken();
+            String email = null;
+            String name = null;
+            String pictureUrl = null;
+            Boolean emailVerified = true;
+
+            // Handle Access Token from useGoogleLogin hook
+            org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.setBearerAuth(token);
+            org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>("", headers);
+            
+            try {
+                org.springframework.http.ResponseEntity<java.util.Map> response = restTemplate.exchange(
+                        "https://www.googleapis.com/oauth2/v3/userinfo", 
+                        org.springframework.http.HttpMethod.GET, 
+                        entity, 
+                        java.util.Map.class);
+                        
+                java.util.Map<String, Object> payload = response.getBody();
+                if (payload == null || !payload.containsKey("email")) {
+                    throw new AppException(ErrorCode.UNAUTHENTICATED);
+                }
+                email = (String) payload.get("email");
+                name = (String) payload.get("name");
+                pictureUrl = (String) payload.get("picture");
+                Object verifiedObj = payload.get("email_verified");
+                if (verifiedObj instanceof Boolean) {
+                    emailVerified = (Boolean) verifiedObj;
+                } else if (verifiedObj instanceof String) {
+                    emailVerified = Boolean.parseBoolean((String) verifiedObj);
+                }
+            } catch (Exception e) {
+                log.error("Failed to fetch user info with access token", e);
+                throw new AppException(ErrorCode.UNAUTHENTICATED);
+            }
+
+            if (email == null) {
+                throw new AppException(ErrorCode.UNAUTHENTICATED);
+            }
+
+            User user = userRepository.findByEmail(email).orElse(null);
+
+            if (user == null) {
+                // Generate next user code logic
+                String maxCode = userRepository.findMaxUserCode();
+                long nextNum = 1;
+                if (maxCode != null && maxCode.startsWith("US")) {
+                    try {
+                        nextNum = Long.parseLong(maxCode.substring(2)) + 1;
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+                String userCode = String.format("US%07d", nextNum);
+
+                user = User.builder()
+                        .email(email)
+                        .userCode(userCode)
+                        .passwordHash(null)
+                        .status(UserStatus.ACTIVE)
+                        .provider(AuthProvider.GOOGLE)
+                        .emailVerified(emailVerified)
+                        .createdAt(OffsetDateTime.now())
+                        .updatedAt(OffsetDateTime.now())
+                        .build();
+
+                user = userRepository.save(user);
+
+                // Assign Student role
+                Role userRole = roleRepository.findByCode("STUDENT").orElse(null);
+                if (userRole != null) {
+                    userRoleRepository.save(UserRole.builder()
+                            .userId(user.getId())
+                            .roleId(userRole.getId())
+                            .build());
+                }
+
+                // Create profile
+                userProfileRepository.save(UserProfile.builder()
+                        .userId(user.getId())
+                        .fullName(name)
+                        .displayName(name)
+                        .avatarUrl(pictureUrl)
+                        .createdAt(OffsetDateTime.now())
+                        .updatedAt(OffsetDateTime.now())
+                        .build());
+            } else {
+                if (user.getStatus() != UserStatus.ACTIVE) {
+                    throw new AppException(ErrorCode.UNAUTHORIZED);
+                }
+            }
+
+            String accessToken = generateToken(user);
+            String refreshToken = generateAndSaveRefreshToken(user);
+
+            return AuthResponse.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .authenticated(true)
+                    .build();
+
+        } catch (AppException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Google authentication failed", e);
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+    }
+
     public AdminProfileResponse getMe(String userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
@@ -197,7 +319,7 @@ public class AuthService {
                 .filter(code -> !code.isEmpty())
                 .collect(Collectors.toList());
 
-        com.langora.user.domain.entity.UserProfile profile =
+        UserProfile profile =
                 userProfileRepository.findByUserId(userId).orElse(null);
 
         return AdminProfileResponse.builder()

@@ -27,6 +27,9 @@ jwt:
   valid-duration: 36000 # in seconds
   refreshable-duration: 36000 # in seconds
 
+google:
+  client-id: "647094432731-fi3i8vjfn21ikll1ck90ejqg40l7aj89.apps.googleusercontent.com"
+
 #cloudinary:
 #  cloud-name: ${CLOUDINARY_CLOUD_NAME}
 #  api-key: ${CLOUDINARY_API_KEY}

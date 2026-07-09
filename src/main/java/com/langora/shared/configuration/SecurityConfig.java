@@ -34,6 +34,7 @@ public class SecurityConfig {
         ApiEndpoint.Client.Auth.BASE + ApiEndpoint.Client.Auth.LOGIN,
         ApiEndpoint.Client.Auth.BASE + ApiEndpoint.Client.Auth.REGISTER,
         ApiEndpoint.Client.Auth.BASE + ApiEndpoint.Client.Auth.REFRESH_TOKEN,
+        ApiEndpoint.Client.Auth.BASE + ApiEndpoint.Client.Auth.GOOGLE_LOGIN,
         ApiEndpoint.Client.PasswordResets.BASE + ApiEndpoint.Client.PasswordResets.REQUEST,
         ApiEndpoint.Client.PasswordResets.BASE + ApiEndpoint.Client.PasswordResets.RESET,
         ApiEndpoint.Client.EmailVerifications.BASE

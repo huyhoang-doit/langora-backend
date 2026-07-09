@@ -106,6 +106,7 @@ public final class ApiEndpoint {
             public static final String REGISTER = "/register";
             public static final String REFRESH_TOKEN = "/refresh-token";
             public static final String LOGOUT = "/logout";
+            public static final String GOOGLE_LOGIN = "/google";
         }
 
         public static final class EmailVerifications {

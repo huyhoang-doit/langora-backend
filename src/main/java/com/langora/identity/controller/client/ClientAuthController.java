@@ -2,6 +2,7 @@ package com.langora.identity.controller.client;
 
 import jakarta.validation.Valid;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.langora.identity.dto.request.ClientLoginRequest;
 import com.langora.identity.dto.request.ClientRegisterRequest;
+import com.langora.identity.dto.request.GoogleLoginRequest;
 import com.langora.identity.dto.request.RefreshTokenRequest;
 import com.langora.identity.dto.response.AuthResponse;
 import com.langora.identity.service.AuthService;
@@ -23,6 +25,7 @@ import lombok.experimental.FieldDefaults;
 @RequestMapping(ApiEndpoint.Client.Auth.BASE)
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class ClientAuthController {
 
     AuthService authService;
@@ -58,5 +61,14 @@ public class ClientAuthController {
     public ApiResponse<Void> logout(@RequestBody @Valid RefreshTokenRequest request) {
         authService.logout(request.getRefreshToken());
         return ApiResponse.<Void>builder().message("Logout successful").build();
+    }
+
+    @PostMapping(ApiEndpoint.Client.Auth.GOOGLE_LOGIN)
+    public ApiResponse<AuthResponse> googleLogin(@RequestBody @Valid GoogleLoginRequest request) {
+        AuthResponse result = authService.googleLogin(request);
+        return ApiResponse.<AuthResponse>builder()
+                .data(result)
+                .message("Google login successfully")
+                .build();
     }
 }
