@@ -14,11 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.langora.identity.domain.entity.User;
+import com.langora.identity.domain.enums.UserStatus;
+import com.langora.identity.dto.request.UserCreationRequest;
+import com.langora.identity.dto.request.UserPasswordUpdateRequest;
 import com.langora.identity.dto.request.UserRoleAssignRequest;
 import com.langora.identity.dto.request.UserStatusUpdateRequest;
 import com.langora.identity.dto.response.LoginHistoryResponse;
+import com.langora.identity.dto.response.RoleResponse;
 import com.langora.identity.dto.response.UserResponse;
+import com.langora.identity.infrastructure.mapper.RoleMapper;
 import com.langora.identity.infrastructure.mapper.UserMapper;
 import com.langora.identity.service.UserService;
 import com.langora.shared.constant.ApiEndpoint;
@@ -37,14 +41,26 @@ public class AdminUserController {
 
     UserService userService;
     UserMapper userMapper;
+    RoleMapper roleMapper;
+
+    @PostMapping
+    public ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
+        return ApiResponse.<UserResponse>builder()
+                .data(userService.createUser(request))
+                .message("Created user successfully")
+                .build();
+    }
 
     @GetMapping
     public ApiResponse<List<UserResponse>> getUsers(
-            @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int limit) {
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) UserStatus status,
+            @RequestParam(required = false) String role,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int limit) {
 
-        Page<User> userPage = userService.getUsers(page, limit);
-        List<UserResponse> data =
-                userPage.getContent().stream().map(userMapper::toUserResponse).toList();
+        Page<UserResponse> userPage = userService.getUsers(search, status, role, page, limit);
+        List<UserResponse> data = userPage.getContent();
 
         PageMeta pageMeta = PageMeta.builder()
                 .page(page)
@@ -68,12 +84,32 @@ public class AdminUserController {
                 .build();
     }
 
+    @GetMapping(ApiEndpoint.Admin.Users.ROLES)
+    public ApiResponse<List<RoleResponse>> getUserRoles(@PathVariable String id) {
+        List<RoleResponse> data = userService.getUserRoles(id).stream()
+                .map(roleMapper::toRoleResponse)
+                .toList();
+        return ApiResponse.<List<RoleResponse>>builder()
+                .data(data)
+                .message("Fetched user roles successfully")
+                .build();
+    }
+
     @PatchMapping(ApiEndpoint.Admin.Users.STATUS)
     public ApiResponse<UserResponse> updateStatus(
             @PathVariable String id, @RequestBody @Valid UserStatusUpdateRequest request) {
         return ApiResponse.<UserResponse>builder()
                 .data(userService.updateStatus(id, request))
                 .message("Updated user status successfully")
+                .build();
+    }
+
+    @PatchMapping(ApiEndpoint.Admin.Users.PASSWORD)
+    public ApiResponse<UserResponse> updatePassword(
+            @PathVariable String id, @RequestBody @Valid UserPasswordUpdateRequest request) {
+        return ApiResponse.<UserResponse>builder()
+                .data(userService.updatePassword(id, request))
+                .message("Updated user password successfully")
                 .build();
     }
 

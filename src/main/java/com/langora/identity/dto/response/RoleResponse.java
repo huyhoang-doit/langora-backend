@@ -18,4 +18,5 @@ public class RoleResponse {
     String name;
     String description;
     Boolean isSystem;
+    Long userCount;
 }

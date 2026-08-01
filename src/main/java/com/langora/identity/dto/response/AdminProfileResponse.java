@@ -1,6 +1,9 @@
 package com.langora.identity.dto.response;
 
+import java.time.LocalDate;
 import java.util.List;
+
+import com.langora.user.domain.enums.GenderType;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -19,6 +22,22 @@ public class AdminProfileResponse {
     String id;
 
     String email;
+
+    String fullName;
+
+    String displayName;
+
+    String avatarUrl;
+
+    LocalDate dateOfBirth;
+
+    GenderType gender;
+
+    String countryCode;
+
+    String timezone;
+
+    String bio;
 
     List<String> roles;
 

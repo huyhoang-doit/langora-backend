@@ -20,11 +20,15 @@ public class WritingTopic {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    String languageId;
+
     String code;
 
     String name;
 
     String description;
+
+    Integer displayOrder;
 
     java.time.OffsetDateTime createdAt;
 

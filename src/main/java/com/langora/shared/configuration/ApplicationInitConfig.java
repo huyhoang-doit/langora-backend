@@ -19,6 +19,13 @@ import com.langora.identity.repository.RolePermissionRepository;
 import com.langora.identity.repository.RoleRepository;
 import com.langora.identity.repository.UserRepository;
 import com.langora.identity.repository.UserRoleRepository;
+import com.langora.learning.domain.entity.Language;
+import com.langora.learning.domain.enums.LanguageStatus;
+import com.langora.learning.domain.repository.LanguageRepository;
+import com.langora.user.domain.entity.UserLanguageProgress;
+import com.langora.user.domain.entity.UserProfile;
+import com.langora.user.repository.UserLanguageProgressRepository;
+import com.langora.user.repository.UserProfileRepository;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +46,10 @@ public class ApplicationInitConfig {
             RoleRepository roleRepository,
             UserRoleRepository userRoleRepository,
             PermissionRepository permissionRepository,
-            RolePermissionRepository rolePermissionRepository) {
+            RolePermissionRepository rolePermissionRepository,
+            UserProfileRepository userProfileRepository,
+            UserLanguageProgressRepository userLanguageProgressRepository,
+            LanguageRepository languageRepository) {
         return args -> {
             log.info("Checking and initializing default data (Roles, Permissions, Users)...");
 
@@ -112,6 +122,7 @@ public class ApplicationInitConfig {
             String adminEmail = "admin@langora.com";
             if (userRepository.findByEmail(adminEmail).isEmpty()) {
                 User adminUser = userRepository.save(User.builder()
+                        .userCode("US0000001")
                         .email(adminEmail)
                         .passwordHash(passwordEncoder.encode("admin123"))
                         .status(UserStatus.ACTIVE)
@@ -126,14 +137,49 @@ public class ApplicationInitConfig {
                         .assignedBy("SYSTEM")
                         .build());
 
+                userProfileRepository.save(UserProfile.builder()
+                        .userId(adminUser.getId())
+                        .createdAt(OffsetDateTime.now())
+                        .updatedAt(OffsetDateTime.now())
+                        .build());
+
+                userLanguageProgressRepository.save(UserLanguageProgress.builder()
+                        .userId(adminUser.getId())
+                        .totalLearnedWords(0)
+                        .totalMasteredWords(0)
+                        .totalLessonsCompleted(0)
+                        .totalStudyMinutes(0)
+                        .currentStreak(0)
+                        .longestStreak(0)
+                        .createdAt(OffsetDateTime.now())
+                        .updatedAt(OffsetDateTime.now())
+                        .build());
+
                 log.warn("Admin user created! Email: {}, Password: admin123", adminEmail);
             }
 
-            // 6. Initialize Member User
+            // 6. Migrate old users to have userCode
+            List<User> oldUsers = userRepository.findAll().stream()
+                    .filter(u -> u.getUserCode() == null)
+                    .toList();
+
+            if (!oldUsers.isEmpty()) {
+                log.info("Migrating {} old users to have userCode...", oldUsers.size());
+                for (User u : oldUsers) {
+                    // Quick and dirty random code for old users to avoid collisions and null constraints
+                    String randomCode = "US" + String.format("%07d", (int) (Math.random() * 10000000));
+                    u.setUserCode(randomCode);
+                }
+                userRepository.saveAll(oldUsers);
+                log.info("Old users migrated successfully.");
+            }
+
+            // 7. Initialize Member User
             String memberEmail = "member@langora.com";
             if (userRepository.findByEmail(memberEmail).isEmpty()) {
                 User memberUser = userRepository.save(User.builder()
                         .email(memberEmail)
+                        .userCode("US0000002")
                         .passwordHash(passwordEncoder.encode("member123"))
                         .status(UserStatus.ACTIVE)
                         .emailVerified(true)
@@ -148,6 +194,33 @@ public class ApplicationInitConfig {
                         .build());
 
                 log.warn("Member user created! Email: {}, Password: member123", memberEmail);
+            }
+
+            // 8. Initialize Languages
+            if (languageRepository.count() == 0) {
+                languageRepository.saveAll(List.of(
+                        Language.builder()
+                                .code("en")
+                                .name("English")
+                                .nativeName("English")
+                                .status(LanguageStatus.ACTIVE)
+                                .createdAt(OffsetDateTime.now())
+                                .build(),
+                        Language.builder()
+                                .code("ja")
+                                .name("Japanese")
+                                .nativeName("日本語")
+                                .status(LanguageStatus.ACTIVE)
+                                .createdAt(OffsetDateTime.now())
+                                .build(),
+                        Language.builder()
+                                .code("zh")
+                                .name("Chinese")
+                                .nativeName("中文")
+                                .status(LanguageStatus.ACTIVE)
+                                .createdAt(OffsetDateTime.now())
+                                .build()));
+                log.info("Initialized default languages: en, ja, zh");
             }
         };
     }

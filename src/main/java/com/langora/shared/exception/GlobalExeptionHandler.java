@@ -7,6 +7,8 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.langora.shared.dto.response.ApiResponse;
 
@@ -19,7 +21,7 @@ public class GlobalExeptionHandler {
     private static final String MIN_ATTRIBUTE = "min";
 
     @ExceptionHandler(value = Exception.class)
-    ResponseEntity<ApiResponse> exceptionHandler(RuntimeException exception) {
+    ResponseEntity<ApiResponse> exceptionHandler(Exception exception) {
         log.error("Exception: ", exception);
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setSuccess(false);
@@ -34,8 +36,25 @@ public class GlobalExeptionHandler {
         ErrorCode errorCode = exception.getErrorCode();
 
         apiResponse.setSuccess(false);
-        apiResponse.setMessage(errorCode.getMsg());
+        if (exception.getCustomMessage() != null
+                && !exception.getCustomMessage().isEmpty()) {
+            apiResponse.setMessage(exception.getCustomMessage());
+        } else {
+            apiResponse.setMessage(errorCode.getMsg());
+        }
         return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
+    }
+
+    @ExceptionHandler(value = MaxUploadSizeExceededException.class)
+    ResponseEntity<ApiResponse> maxUploadSizeExceededExceptionHandler(MaxUploadSizeExceededException exception) {
+        log.error("Exception: ", exception);
+        ErrorCode errorCode = ErrorCode.FILE_TOO_LARGE;
+
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(ApiResponse.builder()
+                        .success(false)
+                        .message(errorCode.getMsg())
+                        .build());
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
@@ -67,6 +86,17 @@ public class GlobalExeptionHandler {
                 .body(ApiResponse.builder()
                         .success(false)
                         .message(errorCode.getMsg())
+                        .build());
+    }
+
+    @ExceptionHandler(value = NoResourceFoundException.class)
+    ResponseEntity<ApiResponse> noResourceFoundExceptionHandler(NoResourceFoundException exception) {
+        ErrorCode errorCode = ErrorCode.RESOURCE_NOT_FOUND;
+
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(ApiResponse.builder()
+                        .success(false)
+                        .message(errorCode.getMsg() + ": " + exception.getResourcePath())
                         .build());
     }
 

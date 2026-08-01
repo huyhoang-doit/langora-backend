@@ -4,6 +4,7 @@ import java.time.*;
 
 import jakarta.persistence.*;
 
+import com.langora.identity.domain.enums.AuthProvider;
 import com.langora.identity.domain.enums.UserStatus;
 
 import lombok.*;
@@ -22,12 +23,19 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    @Column(unique = true, length = 20)
+    String userCode;
+
+    @Column(unique = true, nullable = false)
     String email;
 
     String passwordHash;
 
     @Enumerated(EnumType.STRING)
     UserStatus status;
+
+    @Enumerated(EnumType.STRING)
+    AuthProvider provider;
 
     Boolean emailVerified;
 

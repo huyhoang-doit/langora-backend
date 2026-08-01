@@ -39,14 +39,17 @@ public class RoleService {
     PermissionMapper permissionMapper;
 
     public List<RoleResponse> getRoles() {
-        return roleRepository.findAll().stream().map(roleMapper::toRoleResponse).toList();
+        return roleRepository.findAll().stream()
+                .map(role -> {
+                    RoleResponse response = roleMapper.toRoleResponse(role);
+                    response.setUserCount(userRoleRepository.countByRoleId(role.getId()));
+                    return response;
+                })
+                .toList();
     }
 
     public RoleDetailResponse getRole(String id) {
-        Role role = roleRepository
-                .findById(id)
-                .orElseThrow(() -> new AppException(
-                        ErrorCode.INVALID_KEY)); // You might want to create a ROLE_NOT_FOUND error code
+        Role role = roleRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
 
         List<RolePermission> rolePermissions = rolePermissionRepository.findByRoleId(id);
         List<String> permissionIds =
@@ -64,7 +67,7 @@ public class RoleService {
     @Transactional
     public RoleDetailResponse createRole(RoleCreationRequest request) {
         if (roleRepository.findByCode(request.getCode()).isPresent()) {
-            throw new AppException(ErrorCode.INVALID_KEY); // Should be ROLE_ALREADY_EXISTS
+            throw new AppException(ErrorCode.ROLE_ALREADY_EXISTS);
         }
 
         Role role = Role.builder()
@@ -93,12 +96,10 @@ public class RoleService {
 
     @Transactional
     public RoleDetailResponse updateRole(String id, RoleUpdateRequest request) {
-        Role role = roleRepository
-                .findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY)); // ROLE_NOT_FOUND
+        Role role = roleRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
 
         if (Boolean.TRUE.equals(role.getIsSystem())) {
-            throw new AppException(ErrorCode.INVALID_KEY); // Cannot modify system role
+            throw new AppException(ErrorCode.SYSTEM_ROLE_CANNOT_BE_MODIFIED);
         }
 
         role.setName(request.getName());
@@ -122,14 +123,14 @@ public class RoleService {
 
     @Transactional
     public void deleteRole(String id) {
-        Role role = roleRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
+        Role role = roleRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
 
         if (Boolean.TRUE.equals(role.getIsSystem())) {
-            throw new AppException(ErrorCode.INVALID_KEY); // Cannot delete system role
+            throw new AppException(ErrorCode.SYSTEM_ROLE_CANNOT_BE_MODIFIED);
         }
 
         if (!userRoleRepository.findByRoleId(id).isEmpty()) {
-            throw new AppException(ErrorCode.INVALID_KEY); // ROLE_IN_USE
+            throw new AppException(ErrorCode.ROLE_IN_USE);
         }
 
         rolePermissionRepository.deleteByRoleId(id);
