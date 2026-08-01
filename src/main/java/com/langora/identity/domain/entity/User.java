@@ -4,6 +4,7 @@ import java.time.*;
 
 import jakarta.persistence.*;
 
+import com.langora.identity.domain.enums.AuthProvider;
 import com.langora.identity.domain.enums.UserStatus;
 
 import lombok.*;
@@ -32,6 +33,9 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     UserStatus status;
+
+    @Enumerated(EnumType.STRING)
+    AuthProvider provider;
 
     Boolean emailVerified;
 

@@ -44,6 +44,12 @@ public enum ErrorCode {
     SYSTEM_ROLE_CANNOT_BE_MODIFIED(2002, "Cannot modify or delete a system role", HttpStatus.BAD_REQUEST),
     ROLE_IN_USE(2003, "Role is currently assigned to users and cannot be deleted", HttpStatus.BAD_REQUEST),
     ROLE_ALREADY_EXISTS(2004, "Role code already exists", HttpStatus.BAD_REQUEST),
+
+    // -- AI MANAGEMENT --
+    AI_API_KEY_NOT_FOUND(7001, "AI API Key not found", HttpStatus.NOT_FOUND),
+    AI_API_KEY_IN_USE(7002, "AI API Key is currently in use by prompts", HttpStatus.CONFLICT),
+    AI_PROMPT_NOT_FOUND(7003, "AI Prompt not found", HttpStatus.NOT_FOUND),
+    AI_PROMPT_FIELD_EXISTS(7004, "AI Prompt field already exists", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String msg, HttpStatusCode statusCode) {

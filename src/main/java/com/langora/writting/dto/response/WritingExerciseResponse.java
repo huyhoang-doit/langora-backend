@@ -1,6 +1,7 @@
 package com.langora.writting.dto.response;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,7 @@ public class WritingExerciseResponse {
     Integer creditsReward;
     Integer xpReward;
     Boolean isActive;
+    List<WritingExerciseSentenceResponse> sentences;
     OffsetDateTime createdAt;
     OffsetDateTime updatedAt;
 }

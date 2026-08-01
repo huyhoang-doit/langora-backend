@@ -78,5 +78,103 @@ public final class ApiEndpoint {
             public static final String BASE = Admin.BASE + "/writing-exercise-sentences";
             public static final String ID = "/{id}";
         }
+
+        public static final class Ai {
+            public static final String BASE = Admin.BASE + "/ai";
+
+            public static final class Keys {
+                public static final String BASE = Ai.BASE + "/keys";
+                public static final String ID = "/{id}";
+                public static final String STATUS = "/{id}/status";
+                public static final String BULK = "/bulk";
+            }
+
+            public static final class Prompts {
+                public static final String BASE = Ai.BASE + "/prompts";
+                public static final String ID = "/{id}";
+                public static final String STATUS = "/{id}/status";
+                public static final String BULK = "/bulk";
+            }
+        }
+    }
+
+    public static final class Client {
+
+        public static final class Auth {
+            public static final String BASE = API_V1 + "/auth";
+            public static final String LOGIN = "/login";
+            public static final String REGISTER = "/register";
+            public static final String REFRESH_TOKEN = "/refresh-token";
+            public static final String LOGOUT = "/logout";
+            public static final String GOOGLE_LOGIN = "/google";
+        }
+
+        public static final class EmailVerifications {
+            public static final String BASE = API_V1 + "/email-verifications";
+        }
+
+        public static final class PasswordResets {
+            public static final String BASE = API_V1 + "/password-resets";
+            public static final String REQUEST = "/request";
+            public static final String RESET = "/reset";
+        }
+
+        public static final class LoginHistories {
+            public static final String BASE = API_V1 + "/login-histories";
+            public static final String ME = "/me";
+        }
+
+        public static final class UserProfiles {
+            public static final String BASE = API_V1 + "/user-profiles";
+            public static final String ME = "/me";
+            public static final String AVATAR = "/me/avatar";
+        }
+
+        public static final class UserPreferences {
+            public static final String BASE = API_V1 + "/user-preferences";
+            public static final String ME = "/me";
+        }
+
+        public static final class UserDevices {
+            public static final String BASE = API_V1 + "/user-devices";
+            public static final String ID = "/{id}";
+        }
+
+        public static final class UserLearningProfiles {
+            public static final String BASE = API_V1 + "/user-learning-profiles";
+            public static final String ME = "/me";
+        }
+
+        public static final class UserLearningGoals {
+            public static final String BASE = API_V1 + "/user-learning-goals";
+            public static final String ME = "/me";
+        }
+
+        public static final class Languages {
+            public static final String BASE = API_V1 + "/languages";
+            public static final String ID = "/{id}";
+            public static final String LEVELS = "/{langId}/levels";
+            public static final String WRITING_CONTENT_TYPES = "/{langId}/writing-content-types";
+            public static final String WRITING_TOPICS = "/{langId}/writing-topics";
+        }
+
+        public static final class WritingExercises {
+            public static final String BASE = API_V1 + "/languages/{languageId}/writing-exercises";
+            public static final String ID = "/{id}";
+        }
+
+        public static final class WritingSessions {
+            public static final String BASE = API_V1 + "/writing-sessions";
+            public static final String ID = "/{id}";
+            public static final String SUBMIT = "/{id}/submit";
+            public static final String SENTENCE_ANSWERS = "/{id}/sentence-answers";
+            public static final String BULK_SENTENCE_ANSWERS = "/{id}/bulk-sentence-answers";
+            public static final String AI_FEEDBACKS = "/{id}/ai-feedbacks";
+        }
+
+        public static final class WritingAchievements {
+            public static final String BASE = API_V1 + "/writing-achievements";
+            public static final String ME = "/me";
+        }
     }
 }

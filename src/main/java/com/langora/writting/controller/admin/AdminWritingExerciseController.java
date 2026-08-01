@@ -94,7 +94,8 @@ public class AdminWritingExerciseController {
 
     @PatchMapping(ApiEndpoint.Admin.WritingExercises.CONTENT)
     public ApiResponse<WritingExerciseResponse> updateContent(
-            @PathVariable String id, @RequestBody @Valid com.langora.writting.dto.request.WritingExerciseContentRequest request) {
+            @PathVariable String id,
+            @RequestBody @Valid com.langora.writting.dto.request.WritingExerciseContentRequest request) {
         WritingExerciseResponse result = writingExerciseService.updateContent(id, request);
         return ApiResponse.<WritingExerciseResponse>builder().data(result).build();
     }
@@ -114,8 +115,7 @@ public class AdminWritingExerciseController {
 
     @GetMapping(ApiEndpoint.Admin.WritingExercises.SENTENCES)
     public ApiResponse<List<WritingExerciseSentenceResponse>> getSentencesByExerciseId(
-            @PathVariable("exerciseId") String exerciseId,
-            @RequestParam(required = false) String search) {
+            @PathVariable("exerciseId") String exerciseId, @RequestParam(required = false) String search) {
         List<WritingExerciseSentenceResponse> responses =
                 writingExerciseSentenceService.getSentencesByExerciseId(exerciseId, search);
         return ApiResponse.<List<WritingExerciseSentenceResponse>>builder()

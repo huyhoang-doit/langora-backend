@@ -1,6 +1,7 @@
 package com.langora.writting.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

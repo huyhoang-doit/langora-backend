@@ -37,7 +37,9 @@ public class WritingExerciseSentenceService {
 
         String searchQuery = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
 
-        return writingExerciseSentenceRepository.findByExerciseIdAndSearchOrderBySentenceOrderAsc(exerciseId, searchQuery).stream()
+        return writingExerciseSentenceRepository
+                .findByExerciseIdAndSearchOrderBySentenceOrderAsc(exerciseId, searchQuery)
+                .stream()
                 .map(writingExerciseSentenceMapper::toResponse)
                 .collect(Collectors.toList());
     }

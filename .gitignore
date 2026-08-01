@@ -35,3 +35,6 @@ build/
 ### Custom configs ###
 application-dev.yaml
 application-secret.yaml
+
+# hide target
+target/

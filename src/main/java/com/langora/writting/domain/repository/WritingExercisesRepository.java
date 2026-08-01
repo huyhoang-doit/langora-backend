@@ -23,7 +23,9 @@ public interface WritingExercisesRepository extends JpaRepository<WritingExercis
             + "(:search IS NULL OR :search = '' OR LOWER(w.title) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(w.summary) LIKE LOWER(CONCAT('%', :search, '%'))) AND "
             + "(:levelId IS NULL OR :levelId = '' OR w.levelId = :levelId) AND "
             + "(:topicId IS NULL OR :topicId = '' OR w.topicId = :topicId) AND "
-            + "(:contentTypeId IS NULL OR :contentTypeId = '' OR w.contentTypeId = :contentTypeId)")
+            + "(:contentTypeId IS NULL OR :contentTypeId = '' OR w.contentTypeId = :contentTypeId)"
+            + "AND w.totalSentences IS NOT NULL "
+            + "AND w.content IS NOT NULL")
     Page<WritingExercises> findByFilters(
             @Param("languageId") String languageId,
             @Param("search") String search,

@@ -9,30 +9,36 @@ spring:
       max-file-size: 20MB
       max-request-size: 20MB
   application:
-    name: langora-backend
+    name: ${APP_NAME}
   banner:
     location: banner.txt
   datasource:
-    url: "jdbc:postgresql://localhost:5432/identity_service_db"
-    driverClassName: "org.postgresql.Driver"
-    username: postgres
-    password: 123456
+    url: ${DB_URL}
+    driverClassName: ${DB_DRIVER}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+  ai:
+    openai:
+      api-key: ${OPEN_AI_API_KEY}
+      chat:
+        base-url: ${OPEN_AI_API_URL}
+        completions-path: "${OPEN_AI_COMPLETIONS_PATH}"
+        options:
+          model: ${OPEN_AI_MODEL}
 
 jwt:
-  signerKey: "ci927jBnQ4GsVEqj6ClN77nEFVMbcK4ZDq79UA6StkxWkOZVHGHNZc2HnjoUwiCX"
-  valid-duration: 36000 # in seconds
-  refreshable-duration: 36000 # in seconds
+  signerKey: ${JWT_SIGNER_KEY}
+  valid-duration: ${JWT_VALID_DURATION}
+  refreshable-duration: ${JWT_REFRESHABLE_DURATION}
 
-#cloudinary:
-#  cloud-name: ${CLOUDINARY_CLOUD_NAME}
-#  api-key: ${CLOUDINARY_API_KEY}
-#  api-secret: ${CLOUDINARY_API_SECRET}
+google:
+  client-id: ${GOOGLE_CLIENT_ID}
 
 cloudinary:
-  cloud-name: ${CLOUDINARY_CLOUD_NAME:langora-cloudinary}
-  api-key: ${CLOUDINARY_API_KEY:134994731934112}
-  api-secret: ${CLOUDINARY_API_SECRET:Dk2KO3nDf5Nv0h59SciMHGEPo8Q}
+  cloud-name: ${CLOUDINARY_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_SECRET}
