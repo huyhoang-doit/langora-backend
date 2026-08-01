@@ -52,8 +52,7 @@ public class ClientWritingExerciseController {
 
     @GetMapping(ApiEndpoint.Client.WritingExercises.ID)
     public ApiResponse<WritingExerciseResponse> getExerciseById(
-            @PathVariable String languageId, 
-            @PathVariable String id) {
+            @PathVariable String languageId, @PathVariable String id) {
         WritingExerciseResponse response = writingExerciseService.getExercise(id);
         return ApiResponse.<WritingExerciseResponse>builder()
                 .data(response)

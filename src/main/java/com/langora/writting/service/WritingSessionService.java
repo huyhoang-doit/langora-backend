@@ -8,13 +8,19 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.langora.ai.domain.entity.AiPrompt;
+import com.langora.ai.domain.repository.AiPromptRepository;
+import com.langora.ai.dto.response.AiFeedbackResultDto;
+import com.langora.ai.service.AiGenerationService;
 import com.langora.shared.exception.AppException;
 import com.langora.shared.exception.ErrorCode;
 import com.langora.writting.domain.entity.WritingAiFeedback;
+import com.langora.writting.domain.entity.WritingExerciseSentence;
 import com.langora.writting.domain.entity.WritingSentenceAnswer;
 import com.langora.writting.domain.entity.WritingSession;
 import com.langora.writting.domain.enums.WritingSessionStatus;
 import com.langora.writting.domain.repository.WritingAiFeedbackRepository;
+import com.langora.writting.domain.repository.WritingExerciseSentenceRepository;
 import com.langora.writting.domain.repository.WritingSentenceAnswerRepository;
 import com.langora.writting.domain.repository.WritingSessionRepository;
 import com.langora.writting.dto.request.WritingBulkSentenceAnswerRequest;
@@ -40,6 +46,10 @@ public class WritingSessionService {
     WritingAiFeedbackRepository writingAiFeedbackRepository;
     WritingSessionMapper writingSessionMapper;
     WritingAiFeedbackMapper writingAiFeedbackMapper;
+
+    AiGenerationService aiGenerationService;
+    AiPromptRepository aiPromptRepository;
+    WritingExerciseSentenceRepository writingExerciseSentenceRepository;
 
     public WritingSessionResponse createSession(String userId, WritingSessionCreateRequest request) {
         WritingSession session = WritingSession.builder()
@@ -97,7 +107,8 @@ public class WritingSessionService {
                 grammarScore = grammarScore.add(a.getGrammarScore() != null ? a.getGrammarScore() : BigDecimal.ZERO);
                 vocabScore = vocabScore.add(a.getVocabularyScore() != null ? a.getVocabularyScore() : BigDecimal.ZERO);
                 fluencyScore = fluencyScore.add(a.getFluencyScore() != null ? a.getFluencyScore() : BigDecimal.ZERO);
-                accuracyScore = accuracyScore.add(a.getAccuracyScore() != null ? a.getAccuracyScore() : BigDecimal.ZERO);
+                accuracyScore =
+                        accuracyScore.add(a.getAccuracyScore() != null ? a.getAccuracyScore() : BigDecimal.ZERO);
             }
 
             BigDecimal count = BigDecimal.valueOf(answers.size());
@@ -122,15 +133,30 @@ public class WritingSessionService {
                 .findById(sessionId)
                 .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
 
+        AiPrompt prompt = aiPromptRepository
+                .findByField("WRITING_FEEDBACK")
+                .orElseThrow(
+                        () -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Missing AI Prompt for WRITING_FEEDBACK"));
+
+        WritingExerciseSentence sentence = writingExerciseSentenceRepository
+                .findById(request.getSentenceId())
+                .orElse(null);
+        String originalSentence = sentence != null ? sentence.getSourceText() : null;
+
+        // Call the AI Service
+        AiFeedbackResultDto aiResult =
+                aiGenerationService.generateFeedback(prompt, originalSentence, request.getUserAnswer());
+
         WritingSentenceAnswer answer = WritingSentenceAnswer.builder()
                 .sessionId(sessionId)
                 .sentenceId(request.getSentenceId())
                 .userAnswer(request.getUserAnswer())
-                .aiScore(BigDecimal.valueOf(8.5))
-                .grammarScore(BigDecimal.valueOf(8.0))
-                .vocabularyScore(BigDecimal.valueOf(9.0))
-                .fluencyScore(BigDecimal.valueOf(8.5))
-                .accuracyScore(BigDecimal.valueOf(9.0))
+                .aiScore(aiResult.getAiScore() != null ? aiResult.getAiScore() : BigDecimal.ZERO)
+                .grammarScore(aiResult.getGrammarScore() != null ? aiResult.getGrammarScore() : BigDecimal.ZERO)
+                .vocabularyScore(
+                        aiResult.getVocabularyScore() != null ? aiResult.getVocabularyScore() : BigDecimal.ZERO)
+                .fluencyScore(aiResult.getFluencyScore() != null ? aiResult.getFluencyScore() : BigDecimal.ZERO)
+                .accuracyScore(aiResult.getAccuracyScore() != null ? aiResult.getAccuracyScore() : BigDecimal.ZERO)
                 .submittedAt(OffsetDateTime.now())
                 .createdAt(OffsetDateTime.now())
                 .updatedAt(OffsetDateTime.now())
@@ -141,26 +167,25 @@ public class WritingSessionService {
         session.setCurrentSentenceOrder(session.getCurrentSentenceOrder() + 1);
         writingSessionRepository.save(session);
 
-        // TODO: Real AI Processing Logic should go here.
-        // For now, mock a feedback response
-        WritingAiFeedback mockFeedback = WritingAiFeedback.builder()
+        WritingAiFeedback realFeedback = WritingAiFeedback.builder()
                 .answerId(answer.getId())
-                .overallFeedback("Excellent")
-                .grammarFeedback("Good")
-                .vocabularyFeedback("Good")
-                .fluencyFeedback("Good fluency")
+                .overallFeedback(aiResult.getOverallFeedback() != null ? aiResult.getOverallFeedback() : "No feedback")
+                .grammarFeedback(aiResult.getGrammarFeedback())
+                .vocabularyFeedback(aiResult.getVocabularyFeedback())
+                .fluencyFeedback(aiResult.getFluencyFeedback())
                 .createdAt(OffsetDateTime.now())
                 .build();
-        mockFeedback = writingAiFeedbackRepository.save(mockFeedback);
-        
-        WritingAiFeedbackResponse response = writingAiFeedbackMapper.toResponse(mockFeedback);
+        realFeedback = writingAiFeedbackRepository.save(realFeedback);
+
+        WritingAiFeedbackResponse response = writingAiFeedbackMapper.toResponse(realFeedback);
         response.setSessionId(sessionId);
         response.setSentenceId(request.getSentenceId());
-        
+
         return response;
     }
 
-    public WritingSessionResponse submitBulkSentenceAnswers(String sessionId, WritingBulkSentenceAnswerRequest request) {
+    public WritingSessionResponse submitBulkSentenceAnswers(
+            String sessionId, WritingBulkSentenceAnswerRequest request) {
         WritingSession session = writingSessionRepository
                 .findById(sessionId)
                 .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));

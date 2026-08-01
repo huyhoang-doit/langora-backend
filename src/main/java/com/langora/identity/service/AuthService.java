@@ -3,16 +3,10 @@ package com.langora.identity.service;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import com.langora.identity.domain.enums.AuthProvider;
-import com.langora.identity.dto.request.GoogleLoginRequest;
-import com.langora.user.domain.entity.UserProfile;
-import com.langora.user.repository.UserProfileRepository;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,11 +18,13 @@ import com.langora.identity.domain.entity.Role;
 import com.langora.identity.domain.entity.User;
 import com.langora.identity.domain.entity.UserRole;
 import com.langora.identity.domain.entity.UserSession;
+import com.langora.identity.domain.enums.AuthProvider;
 import com.langora.identity.domain.enums.SessionStatus;
 import com.langora.identity.domain.enums.UserStatus;
 import com.langora.identity.dto.request.AdminLoginRequest;
 import com.langora.identity.dto.request.ClientLoginRequest;
 import com.langora.identity.dto.request.ClientRegisterRequest;
+import com.langora.identity.dto.request.GoogleLoginRequest;
 import com.langora.identity.dto.response.AdminAuthResponse;
 import com.langora.identity.dto.response.AdminProfileResponse;
 import com.langora.identity.dto.response.AuthResponse;
@@ -39,6 +35,8 @@ import com.langora.identity.repository.UserRoleRepository;
 import com.langora.identity.repository.UserSessionRepository;
 import com.langora.shared.exception.AppException;
 import com.langora.shared.exception.ErrorCode;
+import com.langora.user.domain.entity.UserProfile;
+import com.langora.user.repository.UserProfileRepository;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSSigner;
@@ -205,18 +203,19 @@ public class AuthService {
             Boolean emailVerified = true;
 
             // Handle Access Token from useGoogleLogin hook
-            org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+            org.springframework.web.client.RestTemplate restTemplate =
+                    new org.springframework.web.client.RestTemplate();
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
             headers.setBearerAuth(token);
             org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>("", headers);
-            
+
             try {
                 org.springframework.http.ResponseEntity<java.util.Map> response = restTemplate.exchange(
-                        "https://www.googleapis.com/oauth2/v3/userinfo", 
-                        org.springframework.http.HttpMethod.GET, 
-                        entity, 
+                        "https://www.googleapis.com/oauth2/v3/userinfo",
+                        org.springframework.http.HttpMethod.GET,
+                        entity,
                         java.util.Map.class);
-                        
+
                 java.util.Map<String, Object> payload = response.getBody();
                 if (payload == null || !payload.containsKey("email")) {
                     throw new AppException(ErrorCode.UNAUTHENTICATED);
@@ -319,8 +318,7 @@ public class AuthService {
                 .filter(code -> !code.isEmpty())
                 .collect(Collectors.toList());
 
-        UserProfile profile =
-                userProfileRepository.findByUserId(userId).orElse(null);
+        UserProfile profile = userProfileRepository.findByUserId(userId).orElse(null);
 
         return AdminProfileResponse.builder()
                 .id(user.getId())

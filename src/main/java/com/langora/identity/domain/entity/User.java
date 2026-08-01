@@ -2,9 +2,9 @@ package com.langora.identity.domain.entity;
 
 import java.time.*;
 
-import com.langora.identity.domain.enums.AuthProvider;
 import jakarta.persistence.*;
 
+import com.langora.identity.domain.enums.AuthProvider;
 import com.langora.identity.domain.enums.UserStatus;
 
 import lombok.*;

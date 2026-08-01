@@ -45,7 +45,8 @@ public class UserPreferenceService {
         if (request.getLanguageUi() != null) preference.setLanguageUi(request.getLanguageUi());
         if (request.getTimezone() != null) preference.setTimezone(request.getTimezone());
         if (request.getLevelId() != null) {
-            levelRepository.findById(request.getLevelId())
+            levelRepository
+                    .findById(request.getLevelId())
                     .orElseThrow(() -> new AppException(ErrorCode.LEARNING_LEVEL_NOT_FOUND));
             preference.setLevelId(request.getLevelId());
         }
@@ -64,9 +65,9 @@ public class UserPreferenceService {
     private UserPreferenceResponse buildResponse(UserPreference preference) {
         UserPreferenceResponse response = userPreferenceMapper.toResponse(preference);
         if (preference.getLevelId() != null) {
-            levelRepository.findById(preference.getLevelId()).ifPresent(level -> 
-                response.setLevel(levelMapper.toResponse(level))
-            );
+            levelRepository
+                    .findById(preference.getLevelId())
+                    .ifPresent(level -> response.setLevel(levelMapper.toResponse(level)));
         }
         return response;
     }

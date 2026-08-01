@@ -67,14 +67,15 @@ public class AiPromptService {
 
             if (req.getField() == null || req.getField().trim().isEmpty()) {
                 throw new AppException(
-                        ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Mã định danh (field) không được để trống.");
+                        ErrorCode.BULK_IMPORT_FAILED,
+                        "Lỗi dòng " + rowNumber + ": Mã định danh (field) không được để trống.");
             }
             if (processedFields.contains(req.getField())) {
                 throw new AppException(
                         ErrorCode.BULK_IMPORT_FAILED,
                         "Lỗi dòng " + rowNumber + ": Mã định danh '" + req.getField() + "' bị trùng lặp trong file.");
             }
-            
+
             if (aiPromptRepository.existsByField(req.getField())) {
                 throw new AppException(
                         ErrorCode.BULK_IMPORT_FAILED,
@@ -86,14 +87,14 @@ public class AiPromptService {
         java.util.List<AiPrompt> toSave = new java.util.ArrayList<>();
         for (AiPromptRequest req : requests) {
             AiPrompt prompt = AiPrompt.builder()
-                .name(req.getName())
-                .field(req.getField())
-                .systemPrompt(req.getSystemPrompt())
-                .apiKeyId(req.getApiKeyId())
-                .active(req.getActive() != null ? req.getActive() : true)
-                .createdAt(OffsetDateTime.now())
-                .updatedAt(OffsetDateTime.now())
-                .build();
+                    .name(req.getName())
+                    .field(req.getField())
+                    .systemPrompt(req.getSystemPrompt())
+                    .apiKeyId(req.getApiKeyId())
+                    .active(req.getActive() != null ? req.getActive() : true)
+                    .createdAt(OffsetDateTime.now())
+                    .updatedAt(OffsetDateTime.now())
+                    .build();
             toSave.add(prompt);
         }
 
@@ -101,11 +102,10 @@ public class AiPromptService {
     }
 
     public AiPromptResponse updatePrompt(String id, AiPromptRequest request) {
-        AiPrompt prompt = aiPromptRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.AI_PROMPT_NOT_FOUND));
+        AiPrompt prompt =
+                aiPromptRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.AI_PROMPT_NOT_FOUND));
 
-        if (!prompt.getField().equals(request.getField()) 
-                && aiPromptRepository.existsByField(request.getField())) {
+        if (!prompt.getField().equals(request.getField()) && aiPromptRepository.existsByField(request.getField())) {
             throw new AppException(ErrorCode.AI_PROMPT_FIELD_EXISTS);
         }
 
@@ -121,8 +121,8 @@ public class AiPromptService {
     }
 
     public AiPromptResponse updateStatus(String id, AiPromptStatusRequest request) {
-        AiPrompt prompt = aiPromptRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.AI_PROMPT_NOT_FOUND));
+        AiPrompt prompt =
+                aiPromptRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.AI_PROMPT_NOT_FOUND));
 
         prompt.setActive(request.getActive());
         prompt.setUpdatedAt(OffsetDateTime.now());

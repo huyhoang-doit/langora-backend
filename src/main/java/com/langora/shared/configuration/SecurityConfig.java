@@ -30,6 +30,7 @@ public class SecurityConfig {
         "/auth/introspect",
         "/auth/logout",
         "/auth/refresh",
+        "/chat",
         ApiEndpoint.Admin.Auth.BASE + ApiEndpoint.Admin.Auth.LOGIN,
         ApiEndpoint.Client.Auth.BASE + ApiEndpoint.Client.Auth.LOGIN,
         ApiEndpoint.Client.Auth.BASE + ApiEndpoint.Client.Auth.REGISTER,
@@ -71,7 +72,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // Thay đổi domain ứng với URL của frontend
-        configuration.setAllowedOrigins(List.of("http://localhost:3001", "http://localhost:3000"));
+        configuration.setAllowedOrigins(
+                List.of("http://localhost:3001", "http://localhost:3000", "https://langora-admin-portal.vercel.app"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);

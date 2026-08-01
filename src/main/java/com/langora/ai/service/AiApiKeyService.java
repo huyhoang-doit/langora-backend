@@ -48,7 +48,7 @@ public class AiApiKeyService {
                 .createdAt(OffsetDateTime.now())
                 .updatedAt(OffsetDateTime.now())
                 .build();
-        
+
         key = aiApiKeyRepository.save(key);
         return mapToResponseWithMask(key);
     }
@@ -58,7 +58,7 @@ public class AiApiKeyService {
         if (requests == null || requests.isEmpty()) {
             return;
         }
-        
+
         for (int i = 0; i < requests.size(); i++) {
             AiApiKeyRequest req = requests.get(i);
             int rowNumber = i + 1;
@@ -67,34 +67,34 @@ public class AiApiKeyService {
                         ErrorCode.BULK_IMPORT_FAILED, "Lỗi dòng " + rowNumber + ": Provider không được để trống.");
             }
         }
-        
+
         java.util.List<AiApiKey> toSave = new java.util.ArrayList<>();
         for (AiApiKeyRequest req : requests) {
             AiApiKey key = AiApiKey.builder()
-                .provider(req.getProvider())
-                .rawKey(req.getRawKey())
-                .usage(req.getUsage())
-                .rank(req.getRank())
-                .active(req.getActive() != null ? req.getActive() : true)
-                .createdAt(OffsetDateTime.now())
-                .updatedAt(OffsetDateTime.now())
-                .build();
+                    .provider(req.getProvider())
+                    .rawKey(req.getRawKey())
+                    .usage(req.getUsage())
+                    .rank(req.getRank())
+                    .active(req.getActive() != null ? req.getActive() : true)
+                    .createdAt(OffsetDateTime.now())
+                    .updatedAt(OffsetDateTime.now())
+                    .build();
             toSave.add(key);
         }
-        
+
         aiApiKeyRepository.saveAll(toSave);
     }
 
     public AiApiKeyResponse updateApiKey(String id, AiApiKeyRequest request) {
-        AiApiKey key = aiApiKeyRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.AI_API_KEY_NOT_FOUND));
+        AiApiKey key =
+                aiApiKeyRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.AI_API_KEY_NOT_FOUND));
 
         key.setProvider(request.getProvider());
-        
+
         if (StringUtils.hasText(request.getRawKey())) {
             key.setRawKey(request.getRawKey());
         }
-        
+
         key.setUsage(request.getUsage());
         key.setRank(request.getRank());
         key.setActive(request.getActive());
@@ -105,9 +105,9 @@ public class AiApiKeyService {
     }
 
     public AiApiKeyResponse updateStatus(String id, AiApiKeyStatusRequest request) {
-        AiApiKey key = aiApiKeyRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.AI_API_KEY_NOT_FOUND));
-        
+        AiApiKey key =
+                aiApiKeyRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.AI_API_KEY_NOT_FOUND));
+
         key.setActive(request.getActive());
         key.setUpdatedAt(OffsetDateTime.now());
 
@@ -116,8 +116,8 @@ public class AiApiKeyService {
     }
 
     public void deleteApiKey(String id) {
-        AiApiKey key = aiApiKeyRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.AI_API_KEY_NOT_FOUND));
+        AiApiKey key =
+                aiApiKeyRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.AI_API_KEY_NOT_FOUND));
 
         if (aiPromptRepository.existsByApiKeyId(id)) {
             throw new AppException(ErrorCode.AI_API_KEY_IN_USE);

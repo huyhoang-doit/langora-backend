@@ -5,7 +5,6 @@ import java.util.List;
 import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -70,9 +69,7 @@ public class AdminAiApiKeyController {
     @PostMapping(ApiEndpoint.Admin.Ai.Keys.BULK)
     public ApiResponse<Void> bulkImportApiKeys(@RequestBody java.util.List<AiApiKeyRequest> requests) {
         aiApiKeyService.bulkImportApiKeys(requests);
-        return ApiResponse.<Void>builder()
-                .message("Bulk import successful")
-                .build();
+        return ApiResponse.<Void>builder().message("Bulk import successful").build();
     }
 
     @PutMapping(ApiEndpoint.Admin.Ai.Keys.ID)

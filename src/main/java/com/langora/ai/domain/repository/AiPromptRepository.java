@@ -13,6 +13,6 @@ public interface AiPromptRepository extends JpaRepository<AiPrompt, String> {
     Optional<AiPrompt> findByField(String field);
 
     boolean existsByField(String field);
-    
+
     boolean existsByApiKeyId(String apiKeyId);
 }

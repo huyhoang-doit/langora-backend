@@ -20,6 +20,7 @@ import com.langora.learning.domain.repository.LevelRepository;
 import com.langora.shared.exception.AppException;
 import com.langora.shared.exception.ErrorCode;
 import com.langora.writting.domain.entity.WritingContentType;
+import com.langora.writting.domain.entity.WritingExerciseSentence;
 import com.langora.writting.domain.entity.WritingExercises;
 import com.langora.writting.domain.entity.WritingTopic;
 import com.langora.writting.domain.repository.WritingContentTypeRepository;
@@ -30,7 +31,6 @@ import com.langora.writting.dto.request.WritingExerciseRequest;
 import com.langora.writting.dto.request.WritingExerciseStatusUpdateRequest;
 import com.langora.writting.dto.response.WritingExerciseResponse;
 import com.langora.writting.dto.response.WritingExerciseSentenceResponse;
-import com.langora.writting.domain.entity.WritingExerciseSentence;
 import com.langora.writting.infrastructure.mapper.WritingExerciseMapper;
 import com.langora.writting.infrastructure.mapper.WritingExerciseSentenceMapper;
 
@@ -110,7 +110,8 @@ public class WritingExerciseService {
                 .ifPresent(type -> res.setContentTypeName(type.getName()));
         writingTopicRepository.findById(entity.getTopicId()).ifPresent(topic -> res.setTopicName(topic.getName()));
 
-        List<WritingExerciseSentence> sentences = writingExerciseSentenceRepository.findByExerciseIdOrderBySentenceOrderAsc(id);
+        List<WritingExerciseSentence> sentences =
+                writingExerciseSentenceRepository.findByExerciseIdOrderBySentenceOrderAsc(id);
         List<WritingExerciseSentenceResponse> sentenceResponses = sentences.stream()
                 .map(writingExerciseSentenceMapper::toResponse)
                 .collect(Collectors.toList());
