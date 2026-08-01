@@ -73,7 +73,15 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         // Thay đổi domain ứng với URL của frontend
         configuration.setAllowedOrigins(
-                List.of("http://localhost:3001", "http://localhost:3000", "https://langora-admin-portal.vercel.app"));
+                List.of(
+                        "http://localhost:3001",
+                        "http://localhost:3000",
+                        "https://langora-admin-portal.vercel.app",
+                        "https://admin-langora.lvhhoangg.io.vn",
+                        "https://langora.lvhhoangg.io.vn",
+                        "https://langora-web-client.vercel.app"
+                )
+        );
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
