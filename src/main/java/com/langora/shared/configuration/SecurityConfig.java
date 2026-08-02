@@ -41,7 +41,15 @@ public class SecurityConfig {
         ApiEndpoint.Client.EmailVerifications.BASE
     };
 
-    private final String[] PUBLIC_GET_ENDPOINTS = {"/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"};
+    private final String[] PUBLIC_GET_ENDPOINTS = {
+        "/v3/api-docs/**", 
+        "/swagger-ui/**", 
+        "/swagger-ui.html",
+
+        // Get all languages, level for client
+        ApiEndpoint.Client.Languages.BASE,
+        ApiEndpoint.Client.Languages.BASE + ApiEndpoint.Client.Languages.LEVELS
+    };
 
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
