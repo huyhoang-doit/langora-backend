@@ -53,7 +53,7 @@ public class WritingExerciseService {
     WritingExerciseSentenceMapper writingExerciseSentenceMapper;
 
     public Page<WritingExerciseResponse> getExercises(
-            String langId, String search, String levelId, String topicId, String contentTypeId, int page, int size) {
+            String langId, String search, String levelId, String topicId, String contentTypeId, int page, int size, boolean isClient) {
         if (!languageRepository.existsById(langId)) {
             throw new AppException(ErrorCode.LANGUAGE_NOT_FOUND);
         }
@@ -61,7 +61,7 @@ public class WritingExerciseService {
 
         String searchQuery = (search != null && !search.trim().isEmpty()) ? search.trim() : "";
         Page<WritingExercises> exercisePage = writingExercisesRepository.findByFilters(
-                langId, searchQuery, levelId, topicId, contentTypeId, pageable);
+                langId, searchQuery, levelId, topicId, contentTypeId, isClient, pageable);
 
         if (exercisePage.isEmpty()) {
             return new PageImpl<>(List.of(), pageable, 0);

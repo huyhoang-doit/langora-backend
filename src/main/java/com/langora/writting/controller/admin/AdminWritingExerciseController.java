@@ -47,11 +47,12 @@ public class AdminWritingExerciseController {
             @RequestParam(required = false) String levelId,
             @RequestParam(required = false) String topicId,
             @RequestParam(required = false) String contentTypeId,
+            @RequestParam(defaultValue = "false") boolean isClient,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
 
         Page<WritingExerciseResponse> exercisePage =
-                writingExerciseService.getExercises(languageId, search, levelId, topicId, contentTypeId, page, size);
+                writingExerciseService.getExercises(languageId, search, levelId, topicId, contentTypeId, page, size, isClient);
 
         PageMeta meta = PageMeta.builder()
                 .page(page)
