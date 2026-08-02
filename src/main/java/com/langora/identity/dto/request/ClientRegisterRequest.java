@@ -26,4 +26,10 @@ public class ClientRegisterRequest {
 
     @NotBlank(message = "Full name is required")
     String fullName;
+
+    @NotBlank(message = "Target language is required")
+    String targetLanguageId;
+
+    @NotBlank(message = "Current level is required")
+    String currentLevelId;
 }

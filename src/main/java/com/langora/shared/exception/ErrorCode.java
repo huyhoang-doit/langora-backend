@@ -25,6 +25,7 @@ public enum ErrorCode {
     PASSWORD_INVALID(1004, "Password must be at least {min} characters", HttpStatus.BAD_REQUEST),
     USER_NOT_EXISTED(1005, "User not existed", HttpStatus.NOT_FOUND),
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
+    USER_BLOCKED_OR_NOT_ACTIVE(1010, "User blocked or not active", HttpStatus.BAD_REQUEST),
 
     // -- LEARNING / LANGUAGE --
     LANGUAGE_NOT_FOUND(6001, "Language not found", HttpStatus.NOT_FOUND),

@@ -8,6 +8,17 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.langora.user.domain.entity.UserPreference;
+import com.langora.user.domain.entity.UserLearningProfile;
+import com.langora.user.repository.UserPreferenceRepository;
+import com.langora.user.repository.UserLearningProfileRepository;
+import com.langora.user.service.UserPreferenceService;
+import com.langora.learning.domain.entity.Language;
+import com.langora.learning.domain.entity.Level;
+import com.langora.learning.domain.repository.LanguageRepository;
+import com.langora.learning.domain.repository.LevelRepository;
+import org.springframework.data.domain.PageRequest;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -61,8 +72,13 @@ public class AuthService {
     RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
     UserProfileRepository userProfileRepository;
+    UserPreferenceRepository userPreferenceRepository;
+    UserLearningProfileRepository userLearningProfileRepository;
+    com.langora.learning.domain.repository.LanguageRepository languageRepository;
+    com.langora.learning.domain.repository.LevelRepository levelRepository;
     RefreshTokenRepository refreshTokenRepository;
     UserSessionRepository userSessionRepository;
+    UserPreferenceService userPreferenceService;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -124,7 +140,7 @@ public class AuthService {
         }
 
         if (user.getStatus() != UserStatus.ACTIVE) {
-            throw new AppException(ErrorCode.UNAUTHORIZED);
+            throw new AppException(ErrorCode.USER_BLOCKED_OR_NOT_ACTIVE);
         }
 
         String token = generateToken(user);
@@ -167,7 +183,7 @@ public class AuthService {
         user = userRepository.save(user);
 
         // Assign Student role
-        Role userRole = roleRepository.findByCode("STUDENT").orElse(null);
+        Role userRole = roleRepository.findByCode("MEMBER").orElse(null);
         if (userRole != null) {
             userRoleRepository.save(UserRole.builder()
                     .userId(user.getId())
@@ -182,6 +198,19 @@ public class AuthService {
                 .createdAt(OffsetDateTime.now())
                 .updatedAt(OffsetDateTime.now())
                 .build());
+
+
+        // Create learning profile to store targetLanguageId and currentLevelId
+        UserLearningProfile learningProfile = UserLearningProfile.builder()
+                .userId(user.getId())
+                .targetLanguageId(request.getTargetLanguageId())
+                .currentLevelId(request.getCurrentLevelId())
+                .isActive(true)
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
+                .build();
+        userLearningProfileRepository.save(learningProfile);
+
 
         String token = generateToken(user);
         String refreshToken = generateAndSaveRefreshToken(user);
@@ -266,7 +295,7 @@ public class AuthService {
                 user = userRepository.save(user);
 
                 // Assign Student role
-                Role userRole = roleRepository.findByCode("STUDENT").orElse(null);
+                Role userRole = roleRepository.findByCode("MEMBER").orElse(null);
                 if (userRole != null) {
                     userRoleRepository.save(UserRole.builder()
                             .userId(user.getId())
@@ -285,7 +314,58 @@ public class AuthService {
                         .build());
             } else {
                 if (user.getStatus() != UserStatus.ACTIVE) {
-                    throw new AppException(ErrorCode.UNAUTHORIZED);
+                    throw new AppException(ErrorCode.USER_BLOCKED_OR_NOT_ACTIVE);
+                }
+            }
+
+            // Handle Learning Profile for both new and existing users
+            UserLearningProfile learningProfile = userLearningProfileRepository.findByUserId(user.getId()).orElse(null);
+            
+            String reqTargetLanguageId = request.getTargetLanguageId();
+            String reqCurrentLevelId = request.getCurrentLevelId();
+            
+            boolean providedInPayload = (reqTargetLanguageId != null && !reqTargetLanguageId.trim().isEmpty());
+
+            if (providedInPayload) {
+                // User provided explicit preferences, UPSERT
+                if (learningProfile == null) {
+                    learningProfile = UserLearningProfile.builder()
+                            .userId(user.getId())
+                            .isActive(true)
+                            .createdAt(OffsetDateTime.now())
+                            .build();
+                }
+                learningProfile.setTargetLanguageId(reqTargetLanguageId);
+                if (reqCurrentLevelId != null && !reqCurrentLevelId.trim().isEmpty()) {
+                    learningProfile.setCurrentLevelId(reqCurrentLevelId);
+                }
+                learningProfile.setUpdatedAt(OffsetDateTime.now());
+                userLearningProfileRepository.save(learningProfile);
+                
+            } else if (learningProfile == null) {
+                // User didn't provide preferences AND doesn't have a profile yet. Apply defaults!
+                String defaultLangId = null;
+                String defaultLevelId = null;
+                
+                Language defaultLanguage = languageRepository.findByCode("en").orElse(null);
+                if (defaultLanguage != null) {
+                    defaultLangId = defaultLanguage.getId();
+                    List<Level> defaultLevels = levelRepository.findByLanguageId(defaultLangId, PageRequest.of(0, 1)).getContent();
+                    if (!defaultLevels.isEmpty()) {
+                        defaultLevelId = defaultLevels.get(0).getId();
+                    }
+                }
+                
+                if (defaultLangId != null) {
+                    learningProfile = UserLearningProfile.builder()
+                            .userId(user.getId())
+                            .targetLanguageId(defaultLangId)
+                            .currentLevelId(defaultLevelId) // could be null if no levels exist yet
+                            .isActive(true)
+                            .createdAt(OffsetDateTime.now())
+                            .updatedAt(OffsetDateTime.now())
+                            .build();
+                    userLearningProfileRepository.save(learningProfile);
                 }
             }
 
