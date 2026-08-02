@@ -33,6 +33,7 @@ public class ClientWritingExerciseController {
             @RequestParam(required = false) String levelId,
             @RequestParam(required = false) String topicId,
             @RequestParam(required = false) String contentTypeId,
+            @RequestParam(defaultValue = "true") boolean isClient,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "100") int size) {
 
@@ -42,7 +43,7 @@ public class ClientWritingExerciseController {
         // Wait, WritingExerciseService requires langId. So we must pass it.
         // We will pass languageId from query param if available, otherwise it throws exception.
         Page<WritingExerciseResponse> exercisePage =
-                writingExerciseService.getExercises(languageId, search, levelId, topicId, contentTypeId, page, size);
+                writingExerciseService.getExercises(languageId, search, levelId, topicId, contentTypeId, page, size, isClient);
 
         return ApiResponse.<List<WritingExerciseResponse>>builder()
                 .data(exercisePage.getContent())

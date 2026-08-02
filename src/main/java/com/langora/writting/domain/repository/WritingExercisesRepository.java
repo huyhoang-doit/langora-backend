@@ -19,20 +19,29 @@ public interface WritingExercisesRepository extends JpaRepository<WritingExercis
 
     boolean existsByTopicId(String topicId);
 
-    @Query("SELECT w FROM WritingExercises w WHERE w.languageId = :languageId AND "
-            + "(:search IS NULL OR :search = '' OR LOWER(w.title) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(w.summary) LIKE LOWER(CONCAT('%', :search, '%'))) AND "
-            + "(:levelId IS NULL OR :levelId = '' OR w.levelId = :levelId) AND "
-            + "(:topicId IS NULL OR :topicId = '' OR w.topicId = :topicId) AND "
-            + "(:contentTypeId IS NULL OR :contentTypeId = '' OR w.contentTypeId = :contentTypeId)"
-            + "AND w.totalSentences IS NOT NULL "
-            + "AND w.content IS NOT NULL")
+    @Query("""
+    SELECT w FROM WritingExercises w
+    WHERE w.languageId = :languageId
+      AND (:search IS NULL OR :search = '' OR
+           LOWER(w.title) LIKE LOWER(CONCAT('%', :search, '%')) OR
+           LOWER(w.summary) LIKE LOWER(CONCAT('%', :search, '%')))
+      AND (:levelId IS NULL OR :levelId = '' OR w.levelId = :levelId)
+      AND (:topicId IS NULL OR :topicId = '' OR w.topicId = :topicId)
+      AND (:contentTypeId IS NULL OR :contentTypeId = '' OR w.contentTypeId = :contentTypeId)
+      AND (
+            :isClient = false
+            OR (w.totalSentences IS NOT NULL AND w.content IS NOT NULL)
+          )
+""")
     Page<WritingExercises> findByFilters(
             @Param("languageId") String languageId,
             @Param("search") String search,
             @Param("levelId") String levelId,
             @Param("topicId") String topicId,
             @Param("contentTypeId") String contentTypeId,
-            Pageable pageable);
+            @Param("isClient") boolean isClient,
+            Pageable pageable
+    );
 
     @Query("SELECT w.id FROM WritingExercises w WHERE w.languageId = :languageId")
     List<String> findIdsByLanguageId(@Param("languageId") String languageId);
