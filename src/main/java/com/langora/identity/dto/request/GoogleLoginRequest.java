@@ -15,4 +15,8 @@ import lombok.experimental.FieldDefaults;
 public class GoogleLoginRequest {
     @NotBlank(message = "ID Token is required")
     String idToken;
+
+    String targetLanguageId;
+
+    String currentLevelId;
 }
